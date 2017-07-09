@@ -1,0 +1,659 @@
+//#-noreset
+
+:install PULSE 16 0 1
+// Info
+// Entities used
+// xp_orb, armor_stand, fireworks_rocket, item, arrow, area_effect_cloud
+// 1.10 versions
+// XPOrb, ArmorStand, FireworksRocketEntity, Item, Arrow, AreaEffectCloud
+
+// Summon armor stands
+/minecraft:summon ArmorStand ~ ~0.0 ~ {CustomName:"CTF Game",Tags:["CTFGame"],Invulnerable:1,Marker:1,NoGravity:1}
+/minecraft:summon ArmorStand ~ ~0.1 ~ {CustomName:"CTF Red Marker",Tags:["CTFRedMarker","CTFTeamMarker"],Invulnerable:1,Marker:1,NoGravity:1}
+/minecraft:summon ArmorStand ~ ~0.2 ~ {CustomName:"CTF Blue Marker",Tags:["CTFBlueMarker","CTFTeamMarker"],Invulnerable:1,Marker:1,NoGravity:1}
+/minecraft:summon ArmorStand ~ ~0.3 ~ {CustomName:"CTF Team Balancer",Tags:["CTFTeamBalancer"],Invulnerable:1,Marker:1,NoGravity:1}
+/minecraft:summon ArmorStand ~ ~0.4 ~ {CustomName:"CTF Existance Checker",Tags:["CTFExists"],Invulnerable:1,Marker:1,NoGravity:1}
+
+// Scoreboard objectives
+/minecraft:scoreboard objectives add CTFGameState dummy Game State
+/minecraft:scoreboard objectives add CTFActive dummy Active
+/minecraft:scoreboard objectives add CTFScore dummy Score
+/minecraft:scoreboard objectives add CTFScoreKeeper dummy Score Keeper
+/minecraft:scoreboard objectives add CTFTeamCounter dummy Team Count
+/minecraft:scoreboard objectives add CTFRoundTime dummy Round Time
+/minecraft:scoreboard objectives add CTFExists dummy Existance
+/minecraft:scoreboard objectives add CTFTrigger trigger Context Trigger
+/minecraft:scoreboard objectives add CTFSpectate trigger Spectate
+/minecraft:scoreboard objectives add CTFDeathCount deathCount Death Count
+/minecraft:scoreboard objectives add CTFDisconnect stat.leaveGame Disconnect Counter
+
+// Entities with CTFFlagTracker == 1 are the holder of a flag
+// Exception is for the armor stands CTFRed and CTFBlue which count score
+/minecraft:scoreboard objectives add CTFFlagTracker dummy Flag Tracker
+
+// Teams
+/minecraft:scoreboard teams add CTFRed Red Team
+/minecraft:scoreboard teams option CTFRed color red
+/minecraft:scoreboard teams option CTFRed friendlyfire false
+/minecraft:scoreboard teams option CTFRed nametagVisibility hideForOtherTeams
+
+/minecraft:scoreboard teams add CTFBlue Blue Team
+/minecraft:scoreboard teams option CTFBlue color blue
+/minecraft:scoreboard teams option CTFBlue friendlyfire false
+/minecraft:scoreboard teams option CTFBlue nametagVisibility hideForOtherTeams
+
+// Teams not for players
+/minecraft:scoreboard teams add CTFVRed Red Team
+/minecraft:scoreboard teams option CTFVRed color red
+/minecraft:scoreboard teams add CTFVBlue Blue Team
+/minecraft:scoreboard teams option CTFVBlue color blue
+/minecraft:scoreboard teams join CTFVRed Red
+/minecraft:scoreboard teams join CTFVBlue Blue
+/minecraft:scoreboard teams join CTFVRed Red_Score
+/minecraft:scoreboard teams join CTFVBlue Blue_Score
+/minecraft:scoreboard teams join CTFVRed Red_Players
+/minecraft:scoreboard teams join CTFVBlue Blue_Players
+
+// Set constants and defaults
+/minecraft:scoreboard players set Red CTFScore 0
+/minecraft:scoreboard players set Blue CTFScore 0
+/minecraft:scoreboard players set TicksPerSecond CTFRoundTime 20
+/minecraft:scoreboard players set TicksPerMinute CTFRoundTime 1200
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 0
+
+/minecraft:scoreboard players set TimeInTicks CTFRoundTime 12000
+/minecraft:scoreboard players set Winning_Score CTFScore 3
+
+/minecraft:scoreboard players operation @e[type=ArmorStand,tag=CTFGame] CTFRoundTime = TimeInTicks CTFRoundTime
+/minecraft:scoreboard objectives setdisplay sidebar CTFScore
+
+// Initial game state
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFGame] CTFGameState 0
+
+// Turn off natural regeneration
+/minecraft:gamerule naturalRegeneration false
+
+// Configure event server spawn point system
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPtp 33
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPsat 0
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPpvp 1
+
+:uninstall PULSE 16 0 1
+// Teleport all players back to spawn and clear inventories
+/minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1] ~ ~ ~ minecraft:tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint]
+/minecraft:execute @a[tag=CTFSpectator] ~ ~ ~ minecraft:tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint]
+/minecraft:clear @a[score_CTFActive_min=1,score_CTFActive=1]
+
+// Gets rid of all scoreboard objectives, entities, and resets gamerules to vanilla defaults
+/minecraft:kill @e[type=ArmorStand,tag=CTFGame]
+/minecraft:kill @e[type=ArmorStand,tag=CTFRedMarker]
+/minecraft:kill @e[type=ArmorStand,tag=CTFBlueMarker]
+/minecraft:kill @e[type=ArmorStand,tag=CTFTeamBalancer]
+/minecraft:kill @e[type=ArmorStand,tag=CTFExists]
+/minecraft:kill @e[type=Item,tag=CTFFlag]
+/minecraft:kill @e[type=AreaEffectCloud,tag=CTFStartTimer]
+/minecraft:scoreboard objectives remove CTFGameState
+/minecraft:scoreboard objectives remove CTFActive
+/minecraft:scoreboard objectives remove CTFScore
+/minecraft:scoreboard objectives remove CTFScoreKeeper
+/minecraft:scoreboard objectives remove CTFTeamCounter
+/minecraft:scoreboard objectives remove CTFFlagTracker
+/minecraft:scoreboard objectives remove CTFDeathCount
+/minecraft:scoreboard objectives remove CTFDisconnect
+/minecraft:scoreboard objectives remove CTFRoundTime
+/minecraft:scoreboard objectives remove CTFTrigger
+/minecraft:scoreboard objectives remove CTFSpectate
+/minecraft:scoreboard objectives remove CTFExists
+/minecraft:scoreboard teams remove CTFRed
+/minecraft:scoreboard teams remove CTFBlue
+/minecraft:scoreboard teams remove CTFEC
+/minecraft:scoreboard teams remove CTFVRed
+/minecraft:scoreboard teams remove CTFVBlue
+/minecraft:gamerule naturalRegeneration true
+
+// Configure event server spawn point system
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPtp 0
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPsat 1
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPpvp 0
+
+:main CLOCK 16 0 1
+// Keep track of which entities are currently in the game
+/minecraft:scoreboard players set @e CTFActive 0
+
+// [User Input]
+// The following assigns the score CTFActive to all entities within the map (including the lobby)
+// Use an appropriate selector. Replace @e[r=-1]
+/minecraft:scoreboard players set @e[x=535,y=0,z=129,dx=50,dy=256,dz=64,r=-1] CTFActive 1
+
+// Exclude spectators
+/minecraft:scoreboard players set @a[score_CTFActive_min=1,m=creative] CTFActive 2
+/minecraft:scoreboard players set @a[score_CTFActive_min=1,m=spectator] CTFActive 2
+/minecraft:scoreboard players set @a[score_CTFActive_min=1,score_CTFSpectate_min=1] CTFActive 2
+
+// Spectators leave their team if they were on one
+/minecraft:scoreboard teams leave @a[score_CTFActive_min=2,team=CTFRed]
+/minecraft:scoreboard teams leave @a[score_CTFActive_min=2,team=CTFBlue]
+
+// [User Input]
+// Use event server spawn point system. Set spawn points to a random active lobby spawn point
+// Use the assigned 'SPid' for the map -- currently using 33
+scoreboard players add @a[score_CTFActive_min=1,score_CTFActive=1] SPid 0
+execute @a[score_CTFActive_min=1,score_CTFActive=1,score_SPid=-34] ~ ~ ~ minecraft:tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint]
+execute @a[score_CTFActive_min=1,score_CTFActive=1,score_SPid_min=-32] ~ ~ ~ minecraft:tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint]
+scoreboard players set @a[score_CTFActive_min=1,score_CTFActive=1,score_SPid=-34] SPid 33
+scoreboard players set @a[score_CTFActive_min=1,score_CTFActive=1,score_SPid_min=-32] SPid 33
+
+// CTF Control Panel book given to Event Coordinators
+// /give @p written_book 1 0 {pages:["[\"\",{\"text\":\"Capture the Flag\",\"bold\":true},{\"text\":\"\\n\",\"bold\":false},{\"text\":\"Game: \"},{\"text\":\"[Start]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 1\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Teams: \",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[Add Red]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 6\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[Add Blue]\",\"color\":\"blue\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 7\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Winning Score:\",\"color\":\"none\"},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[-]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 5\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[+]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 4\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Time Limit: \",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[-1 min]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 3\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[+1 min]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 2\"}}]"],title:Book,author:TellrawGenerator}
+/minecraft:replaceitem entity @a[score_CTFActive_min=1,score_MCTeams_min=8,score_MCTeams=8] slot.hotbar.6 written_book 1 0 {pages:["[\"\",{\"text\":\"Capture the Flag\",\"bold\":true},{\"text\":\"\\n\",\"bold\":false},{\"text\":\"Game: \"},{\"text\":\"[Start]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 1\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Teams: \",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[Add Red]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 6\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[Add Blue]\",\"color\":\"blue\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 7\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Winning Score:\",\"color\":\"none\"},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[-]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 5\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[+]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 4\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Time Limit: \",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[-1 min]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 3\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[+1 min]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 2\"}}]"],title:"CTF Control Panel",author:"Icohedron"}
+
+// Trigger for Event Coordinators
+/minecraft:scoreboard players enable @a[score_CTFActive_min=1,score_MCTeams_min=8,score_MCTeams=8] CTFTrigger
+// Move from lobby state to start state
+/minecraft:execute @a[score_CTFTrigger_min=1,score_CTFTrigger=1] ~ ~ ~ minecraft:summon AreaEffectCloud ~ ~ ~ {Duration:1,Tags:["CTFStartGame"]}
+// Increment/Decrement time by 1 minute
+/minecraft:execute @a[score_CTFTrigger_min=2,score_CTFTrigger=2] ~ ~ ~ minecraft:scoreboard players add TimeInTicks CTFRoundTime 1200
+/minecraft:execute @a[score_CTFTrigger_min=3,score_CTFTrigger=3] ~ ~ ~ minecraft:scoreboard players remove TimeInTicks CTFRoundTime 1200
+// Increment/Decrement winning score by 1
+/minecraft:execute @a[score_CTFTrigger_min=4,score_CTFTrigger=4] ~ ~ ~ minecraft:scoreboard players add Winning_Score CTFScore 1
+/minecraft:execute @a[score_CTFTrigger_min=5,score_CTFTrigger=5] ~ ~ ~ minecraft:scoreboard players remove Winning_Score CTFScore 1
+// Manual team balancing
+/minecraft:execute @a[score_CTFTrigger_min=6,score_CTFTrigger=6] ~ ~ ~ minecraft:scoreboard players tag @r[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue] add CTFJoinRed
+/minecraft:execute @a[score_CTFTrigger_min=7,score_CTFTrigger=7] ~ ~ ~ minecraft:scoreboard players tag @r[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed] add CTFJoinBlue
+// Change time or winning score via scoreboard commands
+// execute @a[score_CTFTrigger_min=8,score_CTFTrigger=8] ~ ~ ~ minecraft:tellraw @p ["",{"text":"Click ","color":"gold","bold":true},{"text":"here","color":"dark_aqua","bold":true,"clickEvent":{"action":"suggest_command","value":"/scoreboard players set TimeInTicks CTFRoundTime 12000"}},{"text":" to set the time limit","color":"gold","bold":true}]
+// execute @a[score_CTFTrigger_min=9,score_CTFTrigger=9] ~ ~ ~ minecraft:tellraw @p ["",{"text":"Click ","color":"gold","bold":true},{"text":"here","color":"dark_aqua","bold":true,"clickEvent":{"action":"suggest_command","value":"/scoreboard players set Winning_Score CTFScore 3"}},{"text":" to set the winning score","color":"gold","bold":true}]
+/minecraft:scoreboard players set @a[score_CTFTrigger_min=1] CTFTrigger 0
+
+// Set the default game mode
+/minecraft:gamemode adventure @a[score_CTFActive_min=1,score_CTFActive=1,m=!adventure]
+
+// Time
+/minecraft:scoreboard players operation Minutes CTFRoundTime = @e[type=ArmorStand,tag=CTFGame] CTFRoundTime
+/minecraft:scoreboard players operation Minutes CTFRoundTime /= TicksPerMinute CTFRoundTime
+/minecraft:scoreboard players operation Minutes CTFScore = Minutes CTFRoundTime
+
+/minecraft:scoreboard players operation Seconds CTFRoundTime = @e[type=ArmorStand,tag=CTFGame] CTFRoundTime
+/minecraft:scoreboard players operation Seconds CTFRoundTime %= TicksPerMinute CTFRoundTime
+/minecraft:scoreboard players operation Seconds CTFRoundTime /= TicksPerSecond CTFRoundTime
+/minecraft:scoreboard players operation Seconds CTFScore = Seconds CTFRoundTime
+
+//## Assign Teams -- Tagging ###
+
+// Reset team counter
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFRedMarker] CTFTeamCounter 0
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFBlueMarker] CTFTeamCounter 0
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFTeamBalancer] CTFTeamCounter 0
+
+// Count up the number of players on each team
+/minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed] ~ ~ ~ minecraft:scoreboard players add @e[type=ArmorStand,tag=CTFRedMarker] CTFTeamCounter 1
+/minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue] ~ ~ ~ minecraft:scoreboard players add @e[type=ArmorStand,tag=CTFBlueMarker] CTFTeamCounter 1
+
+// Ensure that players are not on other teams unrelated to CTF
+/minecraft:scoreboard players tag @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed] add CTFOnATeam
+/minecraft:scoreboard players tag @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue] add CTFOnATeam
+/minecraft:scoreboard teams leave @a[score_CTFActive_min=1,score_CTFActive=1,tag=!CTFOnATeam]
+/minecraft:scoreboard players tag @a[tag=CTFOnATeam] remove CTFOnATeam
+
+// Take the difference to determine which team needs the extra player (Red - Blue)
+/minecraft:scoreboard players operation @e[type=ArmorStand,tag=CTFTeamBalancer] CTFTeamCounter = @e[type=ArmorStand,tag=CTFRedMarker] CTFTeamCounter
+/minecraft:scoreboard players operation @e[type=ArmorStand,tag=CTFTeamBalancer] CTFTeamCounter -= @e[type=ArmorStand,tag=CTFBlueMarker] CTFTeamCounter
+
+// Both teams have equal numbers of players. Join a random team
+/minecraft:execute @e[type=ArmorStand,tag=CTFTeamBalancer,score_CTFTeamCounter_min=0,score_CTFTeamCounter=0] ~ ~ ~ minecraft:scoreboard players tag @r[score_CTFActive_min=1,score_CTFActive=1,team=,tag=!CTFJoiningTeam] add CTFJoinRandom
+/minecraft:scoreboard players tag @e[tag=CTFRandomTeamMarker] remove CTFRandomTeamMarker
+/minecraft:scoreboard players tag @r[type=ArmorStand,tag=CTFTeamMarker] add CTFRandomTeamMarker
+/minecraft:execute @e[type=ArmorStand,tag=CTFRandomTeamMarker] ~ ~ ~ minecraft:execute @e[r=0,c=1,tag=CTFRedMarker] ~ ~ ~ minecraft:scoreboard players tag @p[tag=CTFJoinRandom] add CTFJoinRed
+/minecraft:execute @e[type=ArmorStand,tag=CTFRandomTeamMarker] ~ ~ ~ minecraft:execute @e[r=0,c=1,tag=CTFBlueMarker] ~ ~ ~ minecraft:scoreboard players tag @p[tag=CTFJoinRandom] add CTFJoinBlue
+/minecraft:scoreboard players tag @a[tag=CTFJoinRandom] remove CTFJoinRandom
+/minecraft:scoreboard players tag @e[tag=CTFRandomTeamMarker] remove CTFRandomTeamMarker
+
+/minecraft:scoreboard players tag @a[tag=CTFJoinRed] add CTFJoiningTeam
+/minecraft:scoreboard players tag @a[tag=CTFJoinBlue] add CTFJoiningTeam
+
+// Blue team has more players. Join Red
+/minecraft:execute @e[type=ArmorStand,tag=CTFTeamBalancer,score_CTFTeamCounter=-1] ~ ~ ~ minecraft:scoreboard players tag @r[score_CTFActive_min=1,score_CTFActive=1,team=,tag=!CTFJoiningTeam] add CTFJoinRed
+/minecraft:scoreboard players tag @a[tag=CTFJoinRed] add CTFJoiningTeam
+
+// Red team has more players. Join Blue
+/minecraft:execute @e[type=ArmorStand,tag=CTFTeamBalancer,score_CTFTeamCounter_min=1] ~ ~ ~ minecraft:scoreboard players tag @r[score_CTFActive_min=1,score_CTFActive=1,team=,tag=!CTFJoiningTeam] add CTFJoinBlue
+/minecraft:scoreboard players tag @a[tag=CTFJoinBlue] add CTFJoiningTeam
+
+// Recursive team assignment tagging to assign teams in a single tick
+// function icohedron:ctf/assign_teams if @a[score_CTFActive_min=1,score_CTFActive=1,team=,tag=!CTFJoiningTeam]
+
+//## End Team Assignment tagging ###
+
+//## Team Assignment ###
+
+// Leave the current team, set spawnpoint
+/minecraft:scoreboard teams leave @a[tag=CTFJoiningTeam]
+/minecraft:execute @a[tag=CTFJoiningTeam] ~ ~ ~ minecraft:tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint,c=1]
+
+// [User Input]
+// Use regular spawn point system
+// /minecraft:spawnpoint @a[tag=CTFJoiningTeam]
+// /minecraft:execute @a[tag=CTFJoiningTeam] ~ ~ ~ minecraft:tellraw @p ["Your spawn point has been set"]
+
+// Clear inventory, teleport to team spawn, announce joining of team, join team, give items
+/minecraft:scoreboard players set @a[tag=CTFJoiningTeam,score_CTFFlagTracker_min=1] CTFFlagTracker 0
+/minecraft:clear @a[tag=CTFJoiningTeam]
+
+/minecraft:execute @a[tag=CTFJoinRed] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] [{"selector":"@p[tag=CTFJoinRed]"}, " joined team ", {"text":"Red","color":"red"}, "!"]
+/minecraft:scoreboard teams join CTFRed @a[tag=CTFJoinRed]
+/minecraft:scoreboard players tag @a[tag=CTFJoinRed] remove CTFJoinRed
+
+/minecraft:execute @a[tag=CTFJoinBlue] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] [{"selector":"@p[tag=CTFJoinBlue]"}, " joined team ", {"text":"Blue","color":"blue"}, "!"]
+/minecraft:scoreboard teams join CTFBlue @a[tag=CTFJoinBlue]
+/minecraft:scoreboard players tag @a[tag=CTFJoinBlue] remove CTFJoinBlue
+
+/minecraft:scoreboard players tag @a[tag=CTFJoiningTeam] remove CTFJoiningTeam
+
+//## End Team Assignment ###
+
+// Give armor
+/minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed] ~ ~ ~ minecraft:replaceitem entity @p slot.armor.head leather_helmet 1 0 {display:{color:16711680},Unbreakable:1}
+/minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed] ~ ~ ~ minecraft:replaceitem entity @p slot.armor.chest leather_chestplate 1 0 {display:{color:16711680},Unbreakable:1}
+/minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed] ~ ~ ~ minecraft:replaceitem entity @p slot.armor.legs leather_leggings 1 0 {display:{color:16711680},Unbreakable:1}
+/minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed] ~ ~ ~ minecraft:replaceitem entity @p slot.armor.feet leather_boots 1 0 {display:{color:16711680},Unbreakable:1}
+
+/minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue] ~ ~ ~ minecraft:replaceitem entity @p slot.armor.head leather_helmet 1 0 {display:{color:255},Unbreakable:1}
+/minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue] ~ ~ ~ minecraft:replaceitem entity @p slot.armor.chest leather_chestplate 1 0 {display:{color:255},Unbreakable:1}
+/minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue] ~ ~ ~ minecraft:replaceitem entity @p slot.armor.legs leather_leggings 1 0 {display:{color:255},Unbreakable:1}
+/minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue] ~ ~ ~ minecraft:replaceitem entity @p slot.armor.feet leather_boots 1 0 {display:{color:255},Unbreakable:1}
+
+// Spectators
+/minecraft:scoreboard players enable @a[score_CTFActive_min=1] CTFSpectate
+// Assign score of 1 for adding a spectator
+// Assign score of -1 for removing a spectator
+// Score of 2 means they are already in spectate
+// Score of 0 means they are not spectating
+/minecraft:execute @a[score_CTFSpectate_min=1,score_CTFSpectate=1] ~ ~ ~ minecraft:tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFSpectatorSpawnPoint]
+/minecraft:clear @a[score_CTFSpectate_min=1,score_CTFSpectate=1]
+/minecraft:scoreboard players set @a[score_CTFSpectate_min=1,score_CTFSpectate=1] CTFSpectate 2
+
+/minecraft:execute @a[score_CTFSpectate_min=-1,score_CTFSpectate=-1] ~ ~ ~ minecraft:tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint]
+/minecraft:scoreboard players set @a[score_CTFSpectate_min=-1,score_CTFSpectate=-1] CTFSpectate 0
+
+// Spectator effects
+/minecraft:effect @a[score_CTFSpectate_min=1] weakness 1 100 true
+/minecraft:effect @a[score_CTFSpectate_min=1] instant_health 1 2 true
+/minecraft:effect @a[score_CTFSpectate_min=1] saturation 1 2 true
+
+:lobby CLOCK 16 0 1
+// This condition must pass before the rest of the commands in this file should run.
+/minecraft:testfor @e[type=ArmorStand,tag=CTFGame,score_CTFGameState_min=0,score_CTFGameState=0]
+// For command block chains initially facing towards positive x (don't set to "Always Active", must be turned on/off with the condition above. Otherwise, it may keep running even after the arena is turned off):
+/minecraft:setblock ~ ~ ~ minecraft:repeating_command_block 13 replace {TrackOutput:0b,auto:0b}
+
+// Effects
+/minecraft:effect @a[score_CTFActive_min=1,score_CTFActive=1] weakness 1 100 true
+/minecraft:effect @a[score_CTFActive_min=1,score_CTFActive=1] instant_health 1 2 true
+/minecraft:effect @a[score_CTFActive_min=1,score_CTFActive=1] saturation 1 2 true
+
+// Kill items and xp
+/minecraft:kill @e[score_CTFActive_min=1,type=Item]
+/minecraft:kill @e[score_CTFActive_min=1,type=XPOrb]
+/minecraft:kill @e[score_CTFActive_min=1,type=Arrow]
+
+// Clear arrows
+/minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFGameState_min=0,score_CTFGameState=0] ~ ~ ~ minecraft:clear @e[score_CTFActive_min=1,score_CTFActive=1] arrow
+
+// Synchronize the timer while it is still able to be configured
+/minecraft:scoreboard players operation @e[type=ArmorStand,tag=CTFGame] CTFRoundTime = TimeInTicks CTFRoundTime
+
+// Switch to game state 1 and teleport players to a random spawn point of their team. Give players their items
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFStartGame] ~ ~ ~ minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFGame] CTFGameState 1
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFStartGame] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed] ~ ~ ~ minecraft:tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedSpawnPoint]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFStartGame] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue] ~ ~ ~ minecraft:tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueSpawnPoint]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFStartGame] ~ ~ ~ minecraft:clear @a[score_CTFActive_min=1,score_CTFActive=1,tag=!InSpawn] arrow
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFStartGame] ~ ~ ~ minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1] slot.hotbar.0 iron_sword 1 0 {Unbreakable:1}
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFStartGame] ~ ~ ~ minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1] slot.hotbar.1 bow 1 0 {Unbreakable:1}
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFStartGame] ~ ~ ~ minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1] slot.hotbar.7 arrow 32 0
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFStartGame] ~ ~ ~ minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed] slot.hotbar.8 wool 1 14 {display:{Name:"Your Team"}}
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFStartGame] ~ ~ ~ minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue] slot.hotbar.8 wool 1 11 {display:{Name:"Your Team"}}
+
+:start CLOCK 16 0 1
+// This condition must pass before the rest of the commands in this file should run.
+/minecraft:testfor @e[type=ArmorStand,tag=CTFGame,score_CTFGameState_min=1,score_CTFGameState=1]
+// For command block chains initially facing towards positive x (don't set to "Always Active", must be turned on/off with the condition above. Otherwise, it may keep running even after the arena is turned off):
+/minecraft:setblock ~ ~ ~ minecraft:repeating_command_block 13 replace {TrackOutput:0b,auto:0b}
+
+// Effects
+/minecraft:effect @a[score_CTFActive_min=1,score_CTFActive=1] saturation 1 2 true
+/minecraft:effect @a[score_CTFActive_min=1,score_CTFActive=1] instant_health 1 2 true
+
+// Kill items and xp
+/minecraft:kill @e[score_CTFActive_min=1,type=Item]
+/minecraft:kill @e[score_CTFActive_min=1,type=XPOrb]
+/minecraft:kill @e[score_CTFActive_min=1,type=Arrow]
+
+// Teleport and keep players in their team spawn. Also resupply their inventories incase they somehow die
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedSpawnPoint] ~ ~ ~ minecraft:scoreboard players tag @a[score_CTFActive_min=1,score_CTFActive=1,r=3,team=CTFRed] add InSpawn
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueSpawnPoint] ~ ~ ~ minecraft:scoreboard players tag @a[score_CTFActive_min=1,score_CTFActive=1,r=3,team=CTFBlue] add InSpawn
+
+/minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,tag=!InSpawn,team=CTFRed] ~ ~ ~ minecraft:tp @p @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedSpawnPoint,c=1]
+/minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,tag=!InSpawn,team=CTFBlue] ~ ~ ~ minecraft:tp @p @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueSpawnPoint,c=1]
+
+/minecraft:clear @a[score_CTFActive_min=1,score_CTFActive=1,tag=!InSpawn] arrow
+/minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,tag=!InSpawn] slot.hotbar.0 iron_sword 1 0 {Unbreakable:1}
+/minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,tag=!InSpawn] slot.hotbar.1 bow 1 0 {Unbreakable:1}
+/minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,tag=!InSpawn] slot.hotbar.7 arrow 32 0
+/minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,tag=!InSpawn,team=CTFRed] slot.hotbar.8 wool 1 14 {display:{Name:"Your Team"}}
+/minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,tag=!InSpawn,team=CTFBlue] slot.hotbar.8 wool 1 11 {display:{Name:"Your Team"}}
+
+/minecraft:scoreboard players tag @a[tag=InSpawn] remove InSpawn
+
+// Create countdown start timer if it does not already exist
+/minecraft:execute @e[type=ArmorStand,tag=CTFExists] ~ ~ ~ minecraft:execute @e[type=AreaEffectCloud,tag=CTFStartTimer] ~ ~ ~ minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 1
+/minecraft:execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ minecraft:summon AreaEffectCloud ~ ~ ~ {Duration:201,Tags:["CTFStartTimer"]}
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 0
+
+// Add a different tag depending on the age of the area effect cloud
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFStartTimer] add CTFCount10 {Age:1}
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFStartTimer] add CTFCount5 {Age:100}
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFStartTimer] add CTFCount4 {Age:120}
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFStartTimer] add CTFCount3 {Age:140}
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFStartTimer] add CTFCount2 {Age:160}
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFStartTimer] add CTFCount1 {Age:180}
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFStartTimer] add CTFStart {Age:200}
+
+// Execute the commands that correspond to each age
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFCount10] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["Capture the Flag begins in 10 seconds"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFCount10] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound minecraft:block.note.pling master @p
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFCount5] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["5"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFCount5] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound minecraft:block.note.pling master @p
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFCount4] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["4"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFCount4] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound minecraft:block.note.pling master @p
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFCount3] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["3"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFCount3] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound minecraft:block.note.pling master @p
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFCount2] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["2"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFCount2] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound minecraft:block.note.pling master @p
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFCount1] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["1"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFCount1] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound minecraft:block.note.pling master @p
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFStart] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["Begin!"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFStart] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound minecraft:entity.wither.death master @p
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFStart] ~ ~ ~ minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFGame] CTFGameState 2
+
+// Remove the tags
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFCount10] remove CTFCount10
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFCount5] remove CTFCount5
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFCount4] remove CTFCount4
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFCount3] remove CTFCount3
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFCount2] remove CTFCount2
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFCount1] remove CTFCount1
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFStart] remove CTFStart
+
+:play CLOCK 16 0 1
+// This condition must pass before the rest of the commands in this file should run.
+/minecraft:testfor @e[type=ArmorStand,tag=CTFGame,score_CTFGameState_min=2,score_CTFGameState=2]
+// For command block chains initially facing towards positive x (don't set to "Always Active", must be turned on/off with the condition above. Otherwise, it may keep running even after the arena is turned off):
+/minecraft:setblock ~ ~ ~ minecraft:repeating_command_block 13 replace {TrackOutput:0b,auto:0b}
+
+// Respawn. Teleport all players in a 3 block radius around the lobby spawn point to their team's spawn point. Also resupply their inventory
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint] ~ ~ ~ minecraft:clear @a[score_CTFActive_min=1,score_CTFActive=1,r=3] arrow
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint] ~ ~ ~ minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,r=3] slot.hotbar.0 iron_sword 1 0 {Unbreakable:1}
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint] ~ ~ ~ minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,r=3] slot.hotbar.1 bow 1 0 {Unbreakable:1}
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint] ~ ~ ~ minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,r=3] slot.hotbar.7 arrow 32 0
+
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint] ~ ~ ~ minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed,r=3] slot.hotbar.8 wool 1 14 {display:{Name:"Your Team"}}
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed,r=3] ~ ~ ~ minecraft:tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedSpawnPoint]
+
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint] ~ ~ ~ minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue,r=3] slot.hotbar.8 wool 1 11 {display:{Name:"Your Team"}}
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue,r=3] ~ ~ ~ minecraft:tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueSpawnPoint]
+
+// Saturation
+/minecraft:effect @a[score_CTFActive_min=1,score_CTFActive=1] saturation 1 2 true
+
+// Regeneration I
+/minecraft:execute @e[type=ArmorStand,tag=CTFExists] ~ ~ ~ minecraft:execute @e[type=AreaEffectCloud,tag=CTFRegenTimer] ~ ~ ~ minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 1
+/minecraft:execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ minecraft:summon AreaEffectCloud ~ ~ ~ {Duration:51,Tags:["CTFRegenTimer"]}
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 0
+
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFRegenTimer] add CTFHealthTick {Age:50}
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFHealthTick] ~ ~ ~ minecraft:effect @a[score_CTFActive_min=1,score_CTFActive=1] regeneration 4 0 true
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFRegenTimer] remove CTFHealthTick
+
+// Kill dropped items, xp, and arrows no longer in the air
+/minecraft:kill @e[score_CTFActive_min=1,type=Item,tag=!CTFFlag]
+/minecraft:kill @e[score_CTFActive_min=1,type=XPOrb]
+
+/minecraft:scoreboard players tag @e[score_CTFActive_min=1,type=Arrow] add InGround {inGround:1b}
+/minecraft:kill @e[score_CTFActive_min=1,type=Arrow,tag=InGround]
+
+// Resupply points
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,r=1] ~ ~ ~ minecraft:clear @p arrow
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,r=1] ~ ~ ~ minecraft:replaceitem entity @p slot.hotbar.0 iron_sword 1 0 {Unbreakable:1}
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,r=1] ~ ~ ~ minecraft:replaceitem entity @p slot.hotbar.1 bow 1 0 {Unbreakable:1}
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,r=1] ~ ~ ~ minecraft:replaceitem entity @p slot.hotbar.7 arrow 32 0
+
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,r=1,team=CTFRed] ~ ~ ~ minecraft:replaceitem entity @p slot.hotbar.8 wool 1 14 {display:{Name:"Your Team"}}
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,r=1,team=CTFBlue] ~ ~ ~ minecraft:replaceitem entity @p slot.hotbar.8 wool 1 11 {display:{Name:"Your Team"}}
+
+// execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ minecraft:effect @a[score_CTFActive_min=1,score_CTFActive=1,r=1] instant_health 1 0
+
+//## Flag Mechanics ###
+
+// If the player died, drop the flag, reset scoreboards
+/minecraft:scoreboard players tag @a[score_CTFFlagTracker_min=1,score_CTFDeathCount_min=1] add CTFResetFlag
+// Kill all existing flag trackers
+/minecraft:execute @a[tag=CTFResetFlag,team=CTFRed] ~ ~ ~ minecraft:kill @e[type=AreaEffectCloud,tag=CTFBlueFlagTracker]
+/minecraft:execute @a[tag=CTFResetFlag,team=CTFBlue] ~ ~ ~ minecraft:kill @e[type=AreaEffectCloud,tag=CTFRedFlagTracker]
+// Drop the flag
+/minecraft:execute @a[tag=CTFResetFlag,team=CTFRed] ~ ~ ~ minecraft:summon Item ~ ~ ~ {Tags:["CTFBlueFlag","CTFFlag"],PickupDelay:32767,Age:-32768,Item:{id:"wool",Count:1,Damage:11},CustomName:"Blue Flag",CustomNameVisible:true,Glowing:true}
+/minecraft:execute @a[tag=CTFResetFlag,team=CTFBlue] ~ ~ ~ minecraft:summon Item ~ ~ ~ {Tags:["CTFRedFlag","CTFFlag"],PickupDelay:32767,Age:-32768,Item:{id:"wool",Count:1,Damage:14},CustomName:"Red Flag",CustomNameVisible:true,Glowing:true}
+/minecraft:execute @a[tag=CTFResetFlag,team=CTFRed] ~ ~ ~ minecraft:scoreboard teams join CTFVBlue @e[type=Item,tag=CTFBlueFlag]
+/minecraft:execute @a[tag=CTFResetFlag,team=CTFBlue] ~ ~ ~ minecraft:scoreboard teams join CTFVRed @e[type=Item,tag=CTFRedFlag]
+// Create flag drop timer
+/minecraft:execute @a[tag=CTFResetFlag,team=CTFRed] ~ ~ ~ minecraft:summon AreaEffectCloud ~ ~ ~ {Duration:1201,Tags:["CTFBlueFlagTimer"]}
+/minecraft:execute @a[tag=CTFResetFlag,team=CTFBlue] ~ ~ ~ minecraft:summon AreaEffectCloud ~ ~ ~ {Duration:1201,Tags:["CTFRedFlagTimer"]}
+// Announce flag drop
+/minecraft:execute @a[tag=CTFResetFlag,team=CTFRed] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] [{"selector":"@a[tag=CTFResetFlag,team=CTFRed]"}, " has dropped the ", {"text":"Blue","color":"blue"}, " flag!"]
+/minecraft:execute @a[tag=CTFResetFlag,team=CTFBlue] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] [{"selector":"@a[tag=CTFResetFlag,team=CTFBlue]"}, " has dropped the ", {"text":"Red","color":"red"}, " flag!"]
+/minecraft:execute @a[tag=CTFResetFlag] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound block.note.snare master @p ~ ~ ~
+/minecraft:scoreboard players set @a[tag=CTFResetFlag] CTFFlagTracker 0
+/minecraft:scoreboard players tag @a[tag=CTFResetFlag] remove CTFResetFlag
+
+// Disconnect detection, change team detection, becoming spectate detection, going out of bounds detection
+/minecraft:scoreboard players set @a[score_CTFActive_min=2,score_CTFFlagTracker_min=1] CTFFlagTracker 0
+/minecraft:scoreboard players set @a[score_CTFActive=0,score_CTFFlagTracker_min=1] CTFFlagTracker 0
+/minecraft:scoreboard players set @a[score_CTFFlagTracker_min=1,score_CTFDisconnect_min=1] CTFFlagTracker 0
+/minecraft:scoreboard players set @a[score_CTFDisconnect_min=1] CTFDisconnect 0
+
+// Detect when the flag holder disappears. Announce that the flag was returned
+// Create an area of effect cloud that lasts for 2 ticks. Execute on the flag holder to kill the area of effect cloud at its last tick. If the cloud isn't killed, it means that the flag holder is missing. Therefore, the flag holder has disappeared!
+/minecraft:execute @a[score_CTFFlagTracker_min=1,team=CTFBlue] ~ ~ ~ minecraft:summon AreaEffectCloud ~ ~ ~ {Duration:2,Tags:["CTFRedFlagTracker","CTFPlayerFlagTracker"]}
+/minecraft:execute @a[score_CTFFlagTracker_min=1,score_CTFDeathCount=0,team=CTFBlue] ~ ~ ~ minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFRedFlagTracker] add CTFKillFlagTracker {Age:1}
+/minecraft:kill @e[type=AreaEffectCloud,tag=CTFKillFlagTracker]
+
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFRedFlagTracker] add CTFReturnRedFlag {Age:1}
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFReturnRedFlag] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["The ", {"text":"Red","color":"red"}, " flag has been returned to its base!"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFReturnRedFlag] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound block.note.hat master @p ~ ~ ~
+
+/minecraft:execute @a[score_CTFFlagTracker_min=1,team=CTFRed] ~ ~ ~ minecraft:summon AreaEffectCloud ~ ~ ~ {Duration:2,Tags:["CTFBlueFlagTracker","CTFPlayerFlagTracker"]}
+/minecraft:execute @a[score_CTFFlagTracker_min=1,score_CTFDeathCount=0,team=CTFRed] ~ ~ ~ minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFBlueFlagTracker] add CTFKillFlagTracker {Age:1}
+/minecraft:kill @e[type=AreaEffectCloud,tag=CTFKillFlagTracker]
+
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFBlueFlagTracker] add CTFReturnBlueFlag {Age:1}
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFReturnBlueFlag] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["The ", {"text":"Blue","color":"blue"}, " flag has been returned to its base!"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFReturnBlueFlag] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound block.note.hat master @p ~ ~ ~
+
+// Assume the flag markers are holding the flag
+/minecraft:scoreboard players set @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedFlagMarker] CTFFlagTracker 1
+/minecraft:scoreboard players set @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker] CTFFlagTracker 1
+
+// Give the flag to the person nearest it of the opposite team
+/minecraft:execute @e[type=Item,tag=CTFRedFlag] ~ ~ ~ minecraft:scoreboard players tag @p[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue,r=1] add CTFPickupRedFlag
+/minecraft:execute @e[type=Item,tag=CTFBlueFlag] ~ ~ ~ minecraft:scoreboard players tag @p[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed,r=1] add CTFPickupBlueFlag
+
+/minecraft:scoreboard players set @a[tag=CTFPickupRedFlag] CTFFlagTracker 1
+/minecraft:scoreboard players set @a[tag=CTFPickupBlueFlag] CTFFlagTracker 1
+
+/minecraft:execute @a[tag=CTFPickupRedFlag] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] [{"selector":"@a[tag=CTFPickupRedFlag]"}, " has taken the ", {"text":"Red","color":"red"}, " flag!"]
+/minecraft:execute @a[tag=CTFPickupRedFlag] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound block.note.hat master @p ~ ~ ~
+/minecraft:execute @a[tag=CTFPickupBlueFlag] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] [{"selector":"@a[tag=CTFPickupBlueFlag]"}, " has taken the ", {"text":"Blue","color":"blue"}, " flag!"]
+/minecraft:execute @a[tag=CTFPickupBlueFlag] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound block.note.hat master @p ~ ~ ~
+
+// Kill the flag timers (when a player dies with the flag) if there are any
+/minecraft:execute @a[tag=CTFPickupRedFlag] ~ ~ ~ minecraft:kill @e[type=AreaEffectCloud,tag=CTFRedFlagTimer]
+/minecraft:execute @a[tag=CTFPickupBlueFlag] ~ ~ ~ minecraft:kill @e[type=AreaEffectCloud,tag=CTFBlueFlagTimer]
+
+/minecraft:scoreboard players tag @a remove CTFPickupRedFlag
+/minecraft:scoreboard players tag @a remove CTFPickupBlueFlag
+
+// Get the flag holder player to tell the respective flag marker that the flag marker isn't holding the flag
+/minecraft:execute @p[score_CTFActive_min=1,score_CTFActive=1,score_CTFFlagTracker_min=1,team=CTFBlue] ~ ~ ~ minecraft:scoreboard players set @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedFlagMarker] CTFFlagTracker 0
+/minecraft:execute @p[score_CTFActive_min=1,score_CTFActive=1,score_CTFFlagTracker_min=1,team=CTFRed] ~ ~ ~ minecraft:scoreboard players set @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker] CTFFlagTracker 0 
+
+// Show the flag in the inventory
+/minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFFlagTracker=0] slot.hotbar.4 air 1 0
+/minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFFlagTracker_min=1,team=CTFRed] slot.hotbar.4 wool 1 11 {display:{Name:"Enemy Flag"},ench:[{id:19,lvl:1}]}
+/minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFFlagTracker_min=1,team=CTFBlue] slot.hotbar.4 wool 1 14 {display:{Name:"Enemy Flag"},ench:[{id:19,lvl:1}]}
+
+// If the flag marker isn't holding the flag, a player must be. So kill existing flags
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedFlagMarker,score_CTFFlagTracker=0] ~ ~ ~ minecraft:kill @e[type=Item,tag=CTFRedFlag]
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker,score_CTFFlagTracker=0] ~ ~ ~ minecraft:kill @e[type=Item,tag=CTFBlueFlag]
+
+// Summon a flag if the marker is holding it. Don't summon if one already exists
+/minecraft:execute @e[type=ArmorStand,tag=CTFExists] ~ ~ ~ minecraft:execute @e[type=Item,tag=CTFRedFlag] ~ ~ ~ minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 1
+/minecraft:execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedFlagMarker,score_CTFFlagTracker_min=1] ~ ~ ~ minecraft:summon Item ~ ~ ~ {Tags:["CTFRedFlag","CTFFlag"],PickupDelay:32767,Age:-32768,Item:{id:"wool",Count:1,Damage:14},CustomName:"Red Flag",CustomNameVisible:true,Glowing:true}
+/minecraft:execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedFlagMarker,score_CTFFlagTracker_min=1] ~ ~ ~ minecraft:scoreboard teams join CTFVRed @e[type=Item,tag=CTFRedFlag]
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 0
+
+/minecraft:execute @e[type=ArmorStand,tag=CTFExists] ~ ~ ~ minecraft:execute @e[type=Item,tag=CTFBlueFlag] ~ ~ ~ minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 1
+/minecraft:execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker,score_CTFFlagTracker_min=1] ~ ~ ~ minecraft:summon Item ~ ~ ~ {Tags:["CTFBlueFlag","CTFFlag"],PickupDelay:32767,Age:-32768,Item:{id:"wool",Count:1,Damage:11},CustomName:"Blue Flag",CustomNameVisible:true,Glowing:true}
+/minecraft:execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker,score_CTFFlagTracker_min=1] ~ ~ ~ minecraft:scoreboard teams join CTFVBlue @e[type=Item,tag=CTFBlueFlag]
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 0
+
+// Expose the thief!
+/minecraft:effect @a[score_CTFActive_min=1,score_CTFFlagTracker_min=1] glowing 1 0 false
+
+// Flag drop expiration
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFRedFlagTimer] add CTFKillRedFlag {Age:1200}
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFBlueFlagTimer] add CTFKillBlueFlag {Age:1200}
+
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFKillRedFlag] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["The ", {"text":"Red","color":"red"}, " flag has been returned to its base!"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFKillRedFlag] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound block.note.hat master @p ~ ~ ~
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFKillBlueFlag] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["The ", {"text":"Blue","color":"blue"}, " flag has been returned to its base!"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFKillBlueFlag] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound block.note.hat master @p ~ ~ ~
+
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFKillRedFlag] ~ ~ ~ minecraft:kill @e[type=Item,tag=CTFRedFlag]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFKillBlueFlag] ~ ~ ~ minecraft:kill @e[type=Item,tag=CTFBlueFlag]
+
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFRedFlagTimer] remove CTFKillRedFlag
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFBlueFlagTimer] remove CTFKillBlueFlag
+
+// Check if flag has been captured
+/minecraft:scoreboard players add @e[type=ArmorStand,tag=CTFRedMarker] CTFFlagTracker 0
+/minecraft:scoreboard players add @e[type=ArmorStand,tag=CTFBlueMarker] CTFFlagTracker 0
+
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedFlagMarker] ~ ~ ~ minecraft:scoreboard players tag @p[score_CTFFlagTracker_min=1,team=CTFRed,r=1] add CTFScoreRed
+// Kill flag trackers
+/minecraft:execute @a[tag=CTFScoreRed] ~ ~ ~ minecraft:kill @e[type=AreaEffectCloud,tag=CTFBlueFlagTracker]
+// Let go of the flag
+/minecraft:scoreboard players set @a[tag=CTFScoreRed] CTFFlagTracker 0
+// Announce score
+/minecraft:execute @a[tag=CTFScoreRed] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] [{"selector":"@p"}, " has successfully captured the ", {"text":"Blue","color":"blue"}, " flag!"]
+/minecraft:execute @a[tag=CTFScoreRed] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound entity.player.levelup master @p ~ ~ ~
+// Remove glowing effect
+/minecraft:effect @a[tag=CTFScoreRed] glowing 0
+// Add 1 to red's score
+/minecraft:execute @a[tag=CTFScoreRed] ~ ~ ~ minecraft:scoreboard players add @e[type=ArmorStand,tag=CTFRedMarker] CTFFlagTracker 1
+/minecraft:scoreboard players tag @a[tag=CTFScoreRed] remove CTFScoreRed
+
+// Rinse and repeat for blue team
+/minecraft:execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker] ~ ~ ~ minecraft:scoreboard players tag @p[score_CTFFlagTracker_min=1,team=CTFBlue,r=1] add CTFScoreBlue
+/minecraft:execute @a[tag=CTFScoreBlue] ~ ~ ~ minecraft:kill @e[type=AreaEffectCloud,tag=CTFRedFlagTracker]
+/minecraft:scoreboard players set @a[tag=CTFScoreBlue] CTFFlagTracker 0
+/minecraft:execute @a[tag=CTFScoreBlue] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] [{"selector":"@p"}, " has successfully captured the ", {"text":"Red","color":"red"}, " flag!"]
+/minecraft:execute @a[tag=CTFScoreBlue] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1] ~ ~ ~ minecraft:playsound entity.player.levelup master @p ~ ~ ~
+/minecraft:effect @a[tag=CTFScoreBlue] glowing 0
+/minecraft:execute @a[tag=CTFScoreBlue] ~ ~ ~ minecraft:scoreboard players add @e[type=ArmorStand,tag=CTFBlueMarker] CTFFlagTracker 1
+/minecraft:scoreboard players tag @a[tag=CTFScoreBlue] remove CTFScoreBlue
+
+// Update Score scoreboard
+/minecraft:scoreboard players operation Red CTFScore = @e[type=ArmorStand,tag=CTFRedMarker] CTFFlagTracker
+/minecraft:scoreboard players operation Blue CTFScore = @e[type=ArmorStand,tag=CTFBlueMarker] CTFFlagTracker
+
+// Check if red or blue have reached the winning score
+/minecraft:scoreboard players operation @e[type=ArmorStand,tag=CTFRedMarker] CTFScoreKeeper = @e[type=ArmorStand,tag=CTFRedMarker] CTFFlagTracker
+/minecraft:scoreboard players operation @e[type=ArmorStand,tag=CTFRedMarker] CTFScoreKeeper -= Winning_Score CTFScore
+/minecraft:scoreboard players operation @e[type=ArmorStand,tag=CTFBlueMarker] CTFScoreKeeper = @e[type=ArmorStand,tag=CTFBlueMarker] CTFFlagTracker
+/minecraft:scoreboard players operation @e[type=ArmorStand,tag=CTFBlueMarker] CTFScoreKeeper -= Winning_Score CTFScore
+// Change to game state 3 if the winning score has been reached
+/minecraft:execute @e[type=ArmorStand,tag=CTFRedMarker,score_CTFScoreKeeper_min=0] ~ ~ ~ minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFGame] CTFGameState 3
+/minecraft:execute @e[type=ArmorStand,tag=CTFBlueMarker,score_CTFScoreKeeper_min=0] ~ ~ ~ minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFGame] CTFGameState 3
+
+// Change to game state 3 if the time limit has been reached
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFGame,score_CTFRoundTime=0] CTFGameState 3
+/minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFRoundTime_min=0,score_CTFRoundTime=0] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["Time is up!"]
+
+// Reset death counter
+/minecraft:scoreboard players set @a CTFDeathCount 0
+
+// Count down on timer
+/minecraft:scoreboard players remove @e[type=ArmorStand,tag=CTFGame] CTFRoundTime 1
+
+:end CLOCK 16 0 1
+// This condition must pass before the rest of the commands in this file should run.
+/minecraft:testfor @e[type=ArmorStand,tag=CTFGame,score_CTFGameState_min=3,score_CTFGameState=3]
+// For command block chains initially facing towards positive x (don't set to "Always Active", must be turned on/off with the condition above. Otherwise, it may keep running even after the arena is turned off):
+/minecraft:setblock ~ ~ ~ minecraft:repeating_command_block 13 replace {TrackOutput:0b,auto:0b}
+
+// Effects
+/minecraft:effect @a[score_CTFActive_min=1,score_CTFActive=1] saturation 1 2 true
+/minecraft:effect @a[score_CTFActive_min=1,score_CTFActive=1] weakness 1 100 true
+/minecraft:effect @a[score_CTFActive_min=1,score_CTFActive=1] instant_health 1 2 true
+
+// Kill items and xp
+/minecraft:kill @e[score_CTFActive_min=1,type=Item,tag=!CTFFlag]
+/minecraft:kill @e[score_CTFActive_min=1,type=XPOrb]
+/minecraft:kill @e[score_CTFActive_min=1,type=Arrow]
+// Remove flags as to not give players the false message that they stil have it
+/minecraft:replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1] slot.hotbar.4 air 1 0
+
+// Summon end countdown timer if it doesn't exist
+/minecraft:execute @e[type=ArmorStand,tag=CTFExists] ~ ~ ~ minecraft:execute @e[type=AreaEffectCloud,tag=CTFEndTimer] ~ ~ ~ minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 1
+/minecraft:execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ minecraft:summon AreaEffectCloud ~ ~ ~ {Duration:201,Tags:["CTFEndTimer"]}
+/minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 0
+
+// Add tags to fireworks and area effect clouds according to their age/life
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFEndTimer] add CTFInitialRocket {Age:0}
+/minecraft:scoreboard players tag @e[type=FireworksRocketEntity,tag=CTFFireworkTimer,c=1] add CTFCreateRocket {Life:20}
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFEndTimer] add CTFEndGame {Age:200}
+
+// Determine the winner based on score
+// Take the difference in score (Red - Blue) to determine the winning team
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFInitialRocket] ~ ~ ~ minecraft:scoreboard players operation @e[type=ArmorStand,tag=CTFGame] CTFScoreKeeper = Red CTFScore
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFInitialRocket] ~ ~ ~ minecraft:scoreboard players operation @e[type=ArmorStand,tag=CTFGame] CTFScoreKeeper -= Blue CTFScore
+// Summon the initial firework for the winning team
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFInitialRocket] ~ ~ ~ minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFScoreKeeper_min=1] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed] ~ ~ ~ minecraft:summon FireworksRocketEntity ~ ~3 ~ {LifeTime:21,Tags:["CTFFireworkTimer"]}
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFInitialRocket] ~ ~ ~ minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFScoreKeeper=-1] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue] ~ ~ ~ minecraft:summon FireworksRocketEntity ~ ~3 ~ {LifeTime:21,Tags:["CTFFireworkTimer"]}
+// Announce winners
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFInitialRocket] ~ ~ ~ minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFScoreKeeper_min=0,score_CTFScoreKeeper=0] ~ ~ ~ minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFGameState_min=3] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["Stalemate!"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFInitialRocket] ~ ~ ~ minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFScoreKeeper_min=0,score_CTFScoreKeeper=0] ~ ~ ~ minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFGameState_min=3] ~ ~ ~ minecraft:title @a[score_CTFActive_min=1] subtitle ["Stalemate!"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFInitialRocket] ~ ~ ~ minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFScoreKeeper_min=1] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["", {"text":"Red","color":"red"}, " team has won!"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFInitialRocket] ~ ~ ~ minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFScoreKeeper_min=1] ~ ~ ~ minecraft:title @a[score_CTFActive_min=1] subtitle ["", {"text":"Red","color":"red"}, " team has won!"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFInitialRocket] ~ ~ ~ minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFScoreKeeper=-1] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1] ["", {"text":"Blue","color":"blue"}, " team has won!"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFInitialRocket] ~ ~ ~ minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFScoreKeeper=-1] ~ ~ ~ minecraft:title @a[score_CTFActive_min=1] subtitle ["", {"text":"Blue","color":"blue"}, " team has won!"]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFInitialRocket] ~ ~ ~ minecraft:title @a[score_CTFActive_min=1] title [""]
+// List players on winning team to event coordinators
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFInitialRocket] ~ ~ ~ minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFScoreKeeper_min=1] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1,score_MCTeams_min=8,score_MCTeams=8] ["Players on winning team: ", {"selector":"@a[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed]"}]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFInitialRocket] ~ ~ ~ minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFScoreKeeper=-1] ~ ~ ~ minecraft:tellraw @a[score_CTFActive_min=1,score_MCTeams_min=8,score_MCTeams=8] ["Players on winning team: ", {"selector":"@a[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue]"}]
+
+// Summon another rocket if the existing ones have reached their time limit
+/minecraft:execute @e[type=FireworksRocketEntity,tag=CTFCreateRocket] ~ ~ ~ minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFScoreKeeper_min=1] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed] ~ ~ ~ minecraft:summon FireworksRocketEntity ~ ~3 ~ {LifeTime:21,Tags:["CTFFireworkTimer"]}
+/minecraft:execute @e[type=FireworksRocketEntity,tag=CTFCreateRocket] ~ ~ ~ minecraft:execute @e[type=ArmorStand,tag=CTFGame,score_CTFScoreKeeper=-1] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue] ~ ~ ~ minecraft:summon FireworksRocketEntity ~ ~3 ~ {LifeTime:21,Tags:["CTFFireworkTimer"]}
+
+// Reset the game and switch to game state 0
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFEndGame] ~ ~ ~ minecraft:execute @a[score_CTFActive_min=1,score_CTFActive=1] ~ ~ ~ minecraft:tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint]
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFEndGame] ~ ~ ~ minecraft:scoreboard players operation @e[type=ArmorStand,tag=CTFGame] CTFRoundTime = TimeInTicks CTFRoundTime
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFEndGame] ~ ~ ~ minecraft:scoreboard players set Red CTFScore 0
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFEndGame] ~ ~ ~ minecraft:scoreboard players set Blue CTFScore 0
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFEndGame] ~ ~ ~ minecraft:scoreboard players set * CTFFlagTracker 0
+/minecraft:execute @e[type=AreaEffectCloud,tag=CTFEndGame] ~ ~ ~ minecraft:scoreboard players set @e[type=ArmorStand,tag=CTFGame] CTFGameState 0
+
+// Remove the tags
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFInitialRocket] remove CTFInitialRocket
+/minecraft:scoreboard players tag @e[type=FireworksRocketEntity,tag=CTFCreateRocket] remove CTFCreateRocket
+/minecraft:scoreboard players tag @e[type=AreaEffectCloud,tag=CTFEndGame] remove CTFEndGame

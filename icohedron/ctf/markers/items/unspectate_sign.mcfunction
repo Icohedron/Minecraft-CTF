@@ -1,0 +1,1 @@
+give @p sign 1 0 {BlockEntityTag: {Text2:"{\"text\":\"Return to Game\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFSpectate set -1\"}}"},display: {Name:"Unspectate Sign"}}

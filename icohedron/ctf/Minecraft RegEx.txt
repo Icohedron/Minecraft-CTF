@@ -1,0 +1,22 @@
+# For Notepad++
+# Ctrl+H (Find & Replace) using regular expressions (make sure to check the box in the lower left corner of the find & replace screen)
+
+# Add 'minecraft:' prefixes to all vanilla commands
+# Keep replacing until no more matches are found
+# Find:
+(^\s*|\n\s*|(execute\s.*(~-?\d*\s){3}))(advancement|ban|ban-ip|banlist|blockdata|clear|clone|debug|defaultgamemode|deop|difficulty|effect|enchant|entitydata|execute|fill|function|gamemode|gamerule|give|help|kick|kill|list|locate|me|op|pardon|particle|playsound|public|recipe|reload|replaceitem|save|save-all|save-off|save-on|say|scoreboard|seed|setblock|setidletimeout|setmaxplayers|setworldspawn|spawnpoint|spreadplayers|stats|stop|stopsound|summon|teleport|tell|tellraw|testfor|testforblock|testforblocks|time|title|toggledownfall|tp|transferserver|trigger|weather|whitelist|worldborder|wsserver|xp)
+# Replace:
+\1minecraft:\4
+
+# Replacing entity names
+# Find:
+(type=|summon\s)(entity)
+# Replace:
+\1entity
+
+# For integrating with CBP
+# Add '/' to before all lines that are not blank, do not already start with '/', and don't start with ':'
+# Find:
+(^[^/:].+$)
+# Replace:
+/\1

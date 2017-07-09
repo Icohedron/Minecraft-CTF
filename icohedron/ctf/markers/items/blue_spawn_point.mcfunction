@@ -1,0 +1,1 @@
+give @p armor_stand 1 0 {display:{Name:"Blue Spawn Point"},EntityTag:{CustomName:"Blue Spawn Point",Invulnerable:1,CustomNameVisible:1,NoGravity:1,Tags:["CTFMarker","CTFBlueSpawnPoint","CTFSpawnPoint"]}}
