@@ -1,6 +1,10 @@
 # Minecraft-CTF  
 Capture the Flag for Minecraft  
 
+Two teams (Red vs Blue).  
+Leather armor, iron sword, and a bow with 32 arrows.  
+Configurable time limit and winning score.  
+
 # Instructions  
 Have at least one of each from icohedron:ctf/markers/items in your map.  
 Only one of each flag may be in a map.  
