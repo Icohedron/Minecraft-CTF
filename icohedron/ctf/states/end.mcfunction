@@ -9,11 +9,15 @@ effect @a[score_CTFActive_min=1,score_CTFActive=1] weakness 1 100 true
 effect @a[score_CTFActive_min=1,score_CTFActive=1] instant_health 1 2 true
 
 # Kill items and xp
-kill @e[score_CTFActive_min=1,type=item,tag=!CTFFlag]
+kill @e[score_CTFActive_min=1,type=item]
 kill @e[score_CTFActive_min=1,type=xp_orb]
 kill @e[score_CTFActive_min=1,type=arrow]
 # Remove flags as to not give players the false message that they stil have it
 replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1] slot.hotbar.4 air 1 0
+
+# Flag Marker particles
+execute @e[type=armor_stand,tag=CTFRedFlagMarker] ~ ~ ~ particle reddust ~ ~.8 ~ 1 0 0 1 0
+execute @e[type=armor_stand,tag=CTFBlueFlagMarker] ~ ~ ~ particle reddust ~ ~.8 ~ 0.001 0 1 1 0
 
 # Summon end countdown timer if it doesn't exist
 execute @e[type=armor_stand,tag=CTFExists] ~ ~ ~ execute @e[type=area_effect_cloud,tag=CTFEndTimer] ~ ~ ~ scoreboard players set @e[type=armor_stand,tag=CTFExists] CTFExists 1
@@ -55,6 +59,7 @@ execute @e[type=area_effect_cloud,tag=CTFEndGame] ~ ~ ~ scoreboard players set R
 execute @e[type=area_effect_cloud,tag=CTFEndGame] ~ ~ ~ scoreboard players set Blue CTFScore 0
 execute @e[type=area_effect_cloud,tag=CTFEndGame] ~ ~ ~ scoreboard players set * CTFFlagTracker 0
 execute @e[type=area_effect_cloud,tag=CTFEndGame] ~ ~ ~ scoreboard players set @e[type=armor_stand,tag=CTFGame] CTFGameState 0
+execute @e[type=area_effect_cloud,tag=CTFEndGame] ~ ~ ~ kill @e[type=armor_stand,tag=CTFFlag]
 
 # Remove the tags
 scoreboard players tag @e[type=area_effect_cloud,tag=CTFInitialRocket] remove CTFInitialRocket

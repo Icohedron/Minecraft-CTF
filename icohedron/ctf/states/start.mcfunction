@@ -12,6 +12,21 @@ kill @e[score_CTFActive_min=1,type=item]
 kill @e[score_CTFActive_min=1,type=xp_orb]
 kill @e[score_CTFActive_min=1,type=arrow]
 
+# Flag Marker particles
+execute @e[type=armor_stand,tag=CTFRedFlagMarker] ~ ~ ~ particle reddust ~ ~.8 ~ 1 0 0 1 0
+execute @e[type=armor_stand,tag=CTFBlueFlagMarker] ~ ~ ~ particle reddust ~ ~.8 ~ 0.001 0 1 1 0
+
+# Summon a flag if one does not exist
+execute @e[type=armor_stand,tag=CTFExists] ~ ~ ~ execute @e[type=armor_stand,tag=CTFRedFlag] ~ ~ ~ scoreboard players set @e[type=armor_stand,tag=CTFExists] CTFExists 1
+execute @e[type=armor_stand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFRedFlagMarker] ~ ~ ~ summon armor_stand ~ ~ ~ {Tags:["CTFRedFlag","CTFFlag"],Invulnerable:1b,NoBasePlate:1b,Small:1b,Marker:1b,ArmorItems:[{},{},{},{id:"wool",Count:1b,Damage:14}],HandItems:[{},{}],CustomName:"Red Flag",DisabledSlots:0,Glowing:1b}
+execute @e[type=armor_stand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFRedFlagMarker] ~ ~ ~ scoreboard teams join CTFVRed @e[type=armor_stand,tag=CTFRedFlag]
+scoreboard players set @e[type=armor_stand,tag=CTFExists] CTFExists 0
+
+execute @e[type=armor_stand,tag=CTFExists] ~ ~ ~ execute @e[type=armor_stand,tag=CTFBlueFlag] ~ ~ ~ scoreboard players set @e[type=armor_stand,tag=CTFExists] CTFExists 1
+execute @e[type=armor_stand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFBlueFlagMarker] ~ ~ ~ summon armor_stand ~ ~ ~ {Tags:["CTFBlueFlag","CTFFlag"],Invulnerable:1b,NoBasePlate:1b,Small:1b,Marker:1b,ArmorItems:[{},{},{},{id:"wool",Count:1b,Damage:11}],HandItems:[{},{}],CustomName:"Blue Flag",DisabledSlots:0,Glowing:1b}
+execute @e[type=armor_stand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFBlueFlagMarker] ~ ~ ~ scoreboard teams join CTFVBlue @e[type=armor_stand,tag=CTFBlueFlag]
+scoreboard players set @e[type=armor_stand,tag=CTFExists] CTFExists 0
+
 # Teleport and keep players in their team spawn. Also resupply their inventories incase they somehow die
 execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFRedSpawnPoint] ~ ~ ~ scoreboard players tag @a[score_CTFActive_min=1,score_CTFActive=1,r=3,team=CTFRed] add InSpawn
 execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFBlueSpawnPoint] ~ ~ ~ scoreboard players tag @a[score_CTFActive_min=1,score_CTFActive=1,r=3,team=CTFBlue] add InSpawn

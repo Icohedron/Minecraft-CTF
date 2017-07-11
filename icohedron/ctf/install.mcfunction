@@ -1,9 +1,3 @@
-# Info
-# Entities used
-# xp_orb, armor_stand, fireworks_rocket, item, arrow, area_effect_cloud
-# 1.10 versions
-# XPOrb, ArmorStand, FireworksRocketEntity, Item, Arrow, AreaEffectCloud
-
 # Summon armor stands
 summon armor_stand ~ ~0.0 ~ {CustomName:"CTF Game",Tags:["CTFGame"],Invulnerable:1,Marker:1,NoGravity:1}
 summon armor_stand ~ ~0.1 ~ {CustomName:"CTF Red Marker",Tags:["CTFRedMarker","CTFTeamMarker"],Invulnerable:1,Marker:1,NoGravity:1}
@@ -60,7 +54,7 @@ scoreboard players set TicksPerMinute CTFRoundTime 1200
 scoreboard players set @e[type=armor_stand,tag=CTFExists] CTFExists 0
 
 scoreboard players set TimeInTicks CTFRoundTime 12000
-scoreboard players set Winning_Score CTFScore 3
+scoreboard players set Winning_Score CTFScore 5
 
 scoreboard players operation @e[type=armor_stand,tag=CTFGame] CTFRoundTime = TimeInTicks CTFRoundTime
 scoreboard objectives setdisplay sidebar CTFScore

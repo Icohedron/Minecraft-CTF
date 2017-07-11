@@ -1,12 +1,6 @@
 //#-noreset
 
 :install PULSE 16 0 1
-// Info
-// Entities used
-// xp_orb, armor_stand, fireworks_rocket, item, arrow, area_effect_cloud
-// 1.10 versions
-// XPOrb, ArmorStand, FireworksRocketEntity, Item, Arrow, AreaEffectCloud
-
 // Summon armor stands
 /summon ArmorStand ~ ~0.0 ~ {CustomName:"CTF Game",Tags:["CTFGame"],Invulnerable:1,Marker:1,NoGravity:1}
 /summon ArmorStand ~ ~0.1 ~ {CustomName:"CTF Red Marker",Tags:["CTFRedMarker","CTFTeamMarker"],Invulnerable:1,Marker:1,NoGravity:1}
@@ -63,7 +57,7 @@
 /scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 0
 
 /scoreboard players set TimeInTicks CTFRoundTime 12000
-/scoreboard players set Winning_Score CTFScore 3
+/scoreboard players set Winning_Score CTFScore 5
 
 /scoreboard players operation @e[type=ArmorStand,tag=CTFGame] CTFRoundTime = TimeInTicks CTFRoundTime
 /scoreboard objectives setdisplay sidebar CTFScore
@@ -78,45 +72,6 @@
 /scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPtp 33
 /scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPsat 0
 /scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPpvp 1
-
-:uninstall PULSE 16 0 1
-// Teleport all players back to spawn and clear inventories
-/execute @a[score_CTFActive_min=1,score_CTFActive=1] ~ ~ ~ tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint]
-/execute @a[tag=CTFSpectator] ~ ~ ~ tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint]
-/clear @a[score_CTFActive_min=1,score_CTFActive=1]
-
-// Gets rid of all scoreboard objectives, entities, and resets gamerules to vanilla defaults
-/kill @e[type=ArmorStand,tag=CTFGame]
-/kill @e[type=ArmorStand,tag=CTFRedMarker]
-/kill @e[type=ArmorStand,tag=CTFBlueMarker]
-/kill @e[type=ArmorStand,tag=CTFTeamBalancer]
-/kill @e[type=ArmorStand,tag=CTFExists]
-/kill @e[type=Item,tag=CTFFlag]
-/kill @e[type=AreaEffectCloud,tag=CTFStartTimer]
-/scoreboard objectives remove CTFGameState
-/scoreboard objectives remove CTFActive
-/scoreboard objectives remove CTFScore
-/scoreboard objectives remove CTFScoreKeeper
-/scoreboard objectives remove CTFTeamCounter
-/scoreboard objectives remove CTFFlagTracker
-/scoreboard objectives remove CTFDeathCount
-/scoreboard objectives remove CTFDisconnect
-/scoreboard objectives remove CTFRoundTime
-/scoreboard objectives remove CTFTrigger
-/scoreboard objectives remove CTFSpectate
-/scoreboard objectives remove CTFExists
-/scoreboard objectives remove CTFResupply
-/scoreboard teams remove CTFRed
-/scoreboard teams remove CTFBlue
-/scoreboard teams remove CTFEC
-/scoreboard teams remove CTFVRed
-/scoreboard teams remove CTFVBlue
-/gamerule naturalRegeneration true
-
-// Configure event server spawn point system
-/scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPtp 33
-/scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPsat 1
-/scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPpvp 0
 
 :main CLOCK 16 0 1
 // Keep track of which entities are currently in the game
@@ -144,8 +99,8 @@
 /scoreboard players set @a[score_CTFActive_min=1,score_CTFActive=1,score_SPid_min=-32] SPid 33
 
 // CTF Control Panel book given to Event Coordinators
-// /give @p written_book 1 0 {pages:["[\"\",{\"text\":\"Capture the Flag\",\"bold\":true},{\"text\":\"\\n\",\"bold\":false},{\"text\":\"Game: \"},{\"text\":\"[Start]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 1\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Teams: \",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[Add Red]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 6\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[Add Blue]\",\"color\":\"blue\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 7\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Winning Score:\",\"color\":\"none\"},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[-]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 5\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[+]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 4\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Time Limit: \",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[-1 min]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 3\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[+1 min]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 2\"}}]"],title:Book,author:TellrawGenerator}
-/replaceitem entity @a[score_CTFActive_min=1,score_MCTeams_min=8,score_MCTeams=8] slot.hotbar.6 written_book 1 0 {pages:["[\"\",{\"text\":\"Capture the Flag\",\"bold\":true},{\"text\":\"\\n\",\"bold\":false},{\"text\":\"Game: \"},{\"text\":\"[Start]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 1\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Teams: \",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[Add Red]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 6\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[Add Blue]\",\"color\":\"blue\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 7\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Winning Score:\",\"color\":\"none\"},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[-]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 5\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[+]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 4\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Time Limit: \",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[-1 min]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 3\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[+1 min]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 2\"}}]"],title:"CTF Control Panel",author:"Icohedron"}
+// {"command":"/give @p written_book 1 0 {pages:%s,title:Book,author:TellrawGenerator}","jobject":[{"text":"Capture the Flag","bold":true},{"text":"\\n"},{"text":"Game:"},{"text":" "},{"text":"[Start]","color":"dark_green","clickEvent":{"action":"run_command","value":"/trigger CTFTrigger set 1"}},{"text":"\\n"},{"text":"Teams:"},{"text":"\\n"},{"text":"[Add Red]","color":"red","clickEvent":{"action":"run_command","value":"/trigger CTFTrigger set 6"}},{"text":" "},{"text":"[Add Blue]","color":"blue","clickEvent":{"action":"run_command","value":"/trigger CTFTrigger set 7"}},{"text":"\\n"},{"text":"[Rebalance Teams]","color":"dark_purple","clickEvent":{"action":"run_command","value":"/trigger CTFTrigger set 8"}},{"text":"\\n\\n"},{"text":"Winning Score:"},{"text":" "},{"text":"[-]","color":"red","clickEvent":{"action":"run_command","value":"/trigger CTFTrigger set 5"}},{"text":" "},{"text":"[+]","color":"dark_green","clickEvent":{"action":"run_command","value":"/trigger CTFTrigger set 4"}},{"text":"\\n"},{"text":"Time:"},{"text":"\\n"},{"text":"[-1 min]","color":"red","clickEvent":{"action":"run_command","value":"/trigger CTFTrigger set 3"}},{"text":" "},{"text":"[+1 min]","color":"dark_green","clickEvent":{"action":"run_command","value":"/trigger CTFTrigger set 2"}},{"text":"\\n"},{"NEW_ITERATE_FLAG":true},{"text":"Advanced Controls","bold":true},{"text":"\\n"},{"text":"Spectate:"},{"text":"\\n"},{"text":"[Add Spectator]","color":"gold","clickEvent":{"action":"run_command","value":"/trigger CTFTrigger set 11"}},{"text":"\\n"},{"text":"Teams:"},{"text":"\\n"},{"text":"[Add Red]","color":"red","clickEvent":{"action":"run_command","value":"/trigger CTFTrigger set 12"}},{"text":" "},{"text":"[Add Blue]","color":"blue","clickEvent":{"action":"run_command","value":"/trigger CTFTrigger set 13"}},{"text":"\\n\\n"},{"text":"Time Limit:"},{"text":"\\n"},{"text":"[Change Time]","color":"gold","clickEvent":{"action":"run_command","value":"/trigger CTFTrigger set 9"}},{"text":"\\n"},{"text":"Winning Score:"},{"text":"\\n"},{"text":"[Change Score]","color":"gold","clickEvent":{"action":"run_command","value":"/trigger CTFTrigger set 10"}},{"text":"\\n"}],"jtemplate":"book"}
+/replaceitem entity @a[score_CTFActive_min=1,score_MCTeams_min=8,score_MCTeams=8] slot.hotbar.6 written_book 1 0 {pages:["[\"\",{\"text\":\"Capture the Flag\",\"bold\":true},{\"text\":\"\\n\",\"bold\":false},{\"text\":\"Game:\"},{\"text\":\" \"},{\"text\":\"[Start]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 1\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Teams:\",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[Add Red]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 6\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[Add Blue]\",\"color\":\"blue\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 7\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[Rebalance Teams]\",\"color\":\"dark_purple\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 8\"}},{\"text\":\"\\n\\n\",\"color\":\"none\"},{\"text\":\"Winning Score:\",\"color\":\"none\"},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[-]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 5\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[+]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 4\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Time:\",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[-1 min]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 3\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[+1 min]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 2\"}},{\"text\":\"\\n\",\"color\":\"none\"}]","[\"\",{\"text\":\"Advanced Controls\",\"bold\":true},{\"text\":\"\\n\",\"bold\":false},{\"text\":\"Spectate:\"},{\"text\":\"\\n\"},{\"text\":\"[Add Spectator]\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 11\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Teams:\",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[Add Red]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 12\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[Add Blue]\",\"color\":\"blue\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 13\"}},{\"text\":\"\\n\\n\",\"color\":\"none\"},{\"text\":\"Time Limit:\",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[Change Time]\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 9\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Winning Score:\",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[Change Score]\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 10\"}},{\"text\":\"\\n\",\"color\":\"none\"}]"],title:"CTF Control Panel",author:"Icohedron"}
 
 // Trigger for Event Coordinators
 /scoreboard players enable @a[score_CTFActive_min=1,score_MCTeams_min=8,score_MCTeams=8] CTFTrigger
@@ -157,12 +112,23 @@
 // Increment/Decrement winning score by 1
 /execute @a[score_CTFTrigger_min=4,score_CTFTrigger=4] ~ ~ ~ scoreboard players add Winning_Score CTFScore 1
 /execute @a[score_CTFTrigger_min=5,score_CTFTrigger=5] ~ ~ ~ scoreboard players remove Winning_Score CTFScore 1
-// Manual team balancing
+// Move one player from blue to red
 /execute @a[score_CTFTrigger_min=6,score_CTFTrigger=6] ~ ~ ~ scoreboard players tag @r[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue] add CTFJoinRed
+// Move one player from red to blue
 /execute @a[score_CTFTrigger_min=7,score_CTFTrigger=7] ~ ~ ~ scoreboard players tag @r[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed] add CTFJoinBlue
-// Change time or winning score via scoreboard commands
-// execute @a[score_CTFTrigger_min=8,score_CTFTrigger=8] ~ ~ ~ tellraw @p ["",{"text":"Click ","color":"gold","bold":true},{"text":"here","color":"dark_aqua","bold":true,"clickEvent":{"action":"suggest_command","value":"/scoreboard players set TimeInTicks CTFRoundTime 12000"}},{"text":" to set the time limit","color":"gold","bold":true}]
-// execute @a[score_CTFTrigger_min=9,score_CTFTrigger=9] ~ ~ ~ tellraw @p ["",{"text":"Click ","color":"gold","bold":true},{"text":"here","color":"dark_aqua","bold":true,"clickEvent":{"action":"suggest_command","value":"/scoreboard players set Winning_Score CTFScore 3"}},{"text":" to set the winning score","color":"gold","bold":true}]
+// Randomize and rebalance teams
+/execute @a[score_CTFTrigger_min=8,score_CTFTrigger=8] ~ ~ ~ scoreboard teams leave @a[team=CTFRed]
+/execute @a[score_CTFTrigger_min=8,score_CTFTrigger=8] ~ ~ ~ scoreboard teams leave @a[team=CTFBlue]
+// Change time, using the scoreboard command, in ticks
+/execute @a[score_CTFTrigger_min=9,score_CTFTrigger=9] ~ ~ ~ tellraw @p ["",{"text":"Click ","color":"gold","bold":true},{"text":"here","color":"dark_aqua","bold":true,"clickEvent":{"action":"suggest_command","value":"/scoreboard players set TimeInTicks CTFRoundTime <time in ticks>"}},{"text":" to set the time limit (in ticks)","color":"gold","bold":true}]
+// Change the winning score using the scoreboard command
+/execute @a[score_CTFTrigger_min=10,score_CTFTrigger=10] ~ ~ ~ tellraw @p ["",{"text":"Click ","color":"gold","bold":true},{"text":"here","color":"dark_aqua","bold":true,"clickEvent":{"action":"suggest_command","value":"/scoreboard players set Winning_Score CTFScore <score>"}},{"text":" to set the winning score","color":"gold","bold":true}]
+// Add a player to spectate using the scoreboard command
+/execute @a[score_CTFTrigger_min=11,score_CTFTrigger=11] ~ ~ ~ tellraw @p ["",{"text":"Click ","color":"gold","bold":true},{"text":"here","color":"dark_aqua","bold":true,"clickEvent":{"action":"suggest_command","value":"/scoreboard players set <player> CTFSpectate 1"}},{"text":" to add someone to ","color":"gold","bold":true},{"text":"Spectator","color":"gray","bold":true}]
+// Add a player to red team using the scoreboard command
+/execute @a[score_CTFTrigger_min=12,score_CTFTrigger=12] ~ ~ ~ tellraw @p ["",{"text":"Click ","color":"gold","bold":true},{"text":"here","color":"dark_aqua","bold":true,"clickEvent":{"action":"suggest_command","value":"/scoreboard players tag <player> add CTFJoinRed"}},{"text":" to add someone to ","color":"gold","bold":true},{"text":"Red","color":"red","bold":true},{"text":" team","color":"gold","bold":true}]
+// Add a player to blue team using the scoreboard command
+/execute @a[score_CTFTrigger_min=13,score_CTFTrigger=13] ~ ~ ~ tellraw @p ["",{"text":"Click ","color":"gold","bold":true},{"text":"here","color":"dark_aqua","bold":true,"clickEvent":{"action":"suggest_command","value":"/scoreboard players tag <player> add CTFJoinBlue"}},{"text":" to add someone to ","color":"gold","bold":true},{"text":"Blue","color":"blue","bold":true},{"text":" team","color":"gold","bold":true}]
 /scoreboard players set @a[score_CTFTrigger_min=1] CTFTrigger 0
 
 // Set the default game mode
@@ -232,8 +198,8 @@
 
 // [User Input 3]
 // Use regular spawn point system
-// spawnpoint @a[tag=CTFJoiningTeam]
-// execute @a[tag=CTFJoiningTeam] ~ ~ ~ tellraw @p ["Your spawn point has been set"]
+// /spawnpoint @a[tag=CTFJoiningTeam]
+// /execute @a[tag=CTFJoiningTeam] ~ ~ ~ tellraw @p ["Your spawn point has been set"]
 
 // Clear inventory, teleport to team spawn, announce joining of team, join team, give items
 /scoreboard players set @a[tag=CTFJoiningTeam,score_CTFFlagTracker_min=1] CTFFlagTracker 0
@@ -328,6 +294,21 @@
 /kill @e[score_CTFActive_min=1,type=XPOrb]
 /kill @e[score_CTFActive_min=1,type=Arrow]
 
+// Flag Marker particles
+/execute @e[type=ArmorStand,tag=CTFRedFlagMarker] ~ ~ ~ particle reddust ~ ~.8 ~ 1 0 0 1 0
+/execute @e[type=ArmorStand,tag=CTFBlueFlagMarker] ~ ~ ~ particle reddust ~ ~.8 ~ 0.001 0 1 1 0
+
+// Summon a flag if one does not exist
+/execute @e[type=ArmorStand,tag=CTFExists] ~ ~ ~ execute @e[type=ArmorStand,tag=CTFRedFlag] ~ ~ ~ scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 1
+/execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedFlagMarker] ~ ~ ~ summon ArmorStand ~ ~ ~ {Tags:["CTFRedFlag","CTFFlag"],Invulnerable:1b,NoBasePlate:1b,Small:1b,Marker:1b,ArmorItems:[{},{},{},{id:"wool",Count:1b,Damage:14}],HandItems:[{},{}],CustomName:"Red Flag",DisabledSlots:0,Glowing:1b}
+/execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedFlagMarker] ~ ~ ~ scoreboard teams join CTFVRed @e[type=ArmorStand,tag=CTFRedFlag]
+/scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 0
+
+/execute @e[type=ArmorStand,tag=CTFExists] ~ ~ ~ execute @e[type=ArmorStand,tag=CTFBlueFlag] ~ ~ ~ scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 1
+/execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker] ~ ~ ~ summon ArmorStand ~ ~ ~ {Tags:["CTFBlueFlag","CTFFlag"],Invulnerable:1b,NoBasePlate:1b,Small:1b,Marker:1b,ArmorItems:[{},{},{},{id:"wool",Count:1b,Damage:11}],HandItems:[{},{}],CustomName:"Blue Flag",DisabledSlots:0,Glowing:1b}
+/execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker] ~ ~ ~ scoreboard teams join CTFVBlue @e[type=ArmorStand,tag=CTFBlueFlag]
+/scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 0
+
 // Teleport and keep players in their team spawn. Also resupply their inventories incase they somehow die
 /execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedSpawnPoint] ~ ~ ~ scoreboard players tag @a[score_CTFActive_min=1,score_CTFActive=1,r=3,team=CTFRed] add InSpawn
 /execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueSpawnPoint] ~ ~ ~ scoreboard players tag @a[score_CTFActive_min=1,score_CTFActive=1,r=3,team=CTFBlue] add InSpawn
@@ -415,17 +396,14 @@
 /scoreboard players tag @e[type=AreaEffectCloud,tag=CTFRegenTimer] remove CTFHealthTick
 
 // Kill dropped items, xp, and arrows no longer in the air
-/kill @e[score_CTFActive_min=1,type=Item,tag=!CTFFlag]
+/kill @e[score_CTFActive_min=1,type=Item]
 /kill @e[score_CTFActive_min=1,type=XPOrb]
 
 /scoreboard players tag @e[score_CTFActive_min=1,type=Arrow] add InGround {inGround:1b}
 /kill @e[score_CTFActive_min=1,type=Arrow,tag=InGround]
 
 // Resupply points
-/scoreboard players tag @a[score_CTFActive_min=1,score_CTFActive=1] add CTFNotOnResupply
-/execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ scoreboard players tag @a[score_CTFActive_min=1,score_CTFActive=1,r=1] remove CTFNotOnResupply
-/scoreboard players set @a[tag=CTFNotOnResupply] CTFResupply 0
-/scoreboard players tag @a[tag=CTFNotOnResupply] remove CTFNotOnResupply
+/scoreboard players add @a[score_CTFActive_min=1,score_CTFActive=1] CTFResupply 0
 
 /execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1] ~ ~ ~ clear @p arrow
 /execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1] ~ ~ ~ replaceitem entity @p slot.hotbar.0 iron_sword 1 0 {Unbreakable:1}
@@ -445,16 +423,20 @@
 
 //## Flag Mechanics ###
 
+// Flag Marker particles
+/execute @e[type=ArmorStand,tag=CTFRedFlagMarker] ~ ~ ~ particle reddust ~ ~.8 ~ 1 0 0 1 0
+/execute @e[type=ArmorStand,tag=CTFBlueFlagMarker] ~ ~ ~ particle reddust ~ ~.8 ~ 0.001 0 1 1 0
+
 // If the player died, drop the flag, reset scoreboards
 /scoreboard players tag @a[score_CTFFlagTracker_min=1,score_CTFDeathCount_min=1] add CTFResetFlag
 // Kill all existing flag trackers
 /execute @a[tag=CTFResetFlag,team=CTFRed] ~ ~ ~ kill @e[type=AreaEffectCloud,tag=CTFBlueFlagTracker]
 /execute @a[tag=CTFResetFlag,team=CTFBlue] ~ ~ ~ kill @e[type=AreaEffectCloud,tag=CTFRedFlagTracker]
 // Drop the flag
-/execute @a[tag=CTFResetFlag,team=CTFRed] ~ ~ ~ summon Item ~ ~ ~ {Tags:["CTFBlueFlag","CTFFlag"],PickupDelay:32767,Age:-32768,Item:{id:"wool",Count:1,Damage:11},CustomName:"Blue Flag",CustomNameVisible:true,Glowing:true}
-/execute @a[tag=CTFResetFlag,team=CTFBlue] ~ ~ ~ summon Item ~ ~ ~ {Tags:["CTFRedFlag","CTFFlag"],PickupDelay:32767,Age:-32768,Item:{id:"wool",Count:1,Damage:14},CustomName:"Red Flag",CustomNameVisible:true,Glowing:true}
-/execute @a[tag=CTFResetFlag,team=CTFRed] ~ ~ ~ scoreboard teams join CTFVBlue @e[type=Item,tag=CTFBlueFlag]
-/execute @a[tag=CTFResetFlag,team=CTFBlue] ~ ~ ~ scoreboard teams join CTFVRed @e[type=Item,tag=CTFRedFlag]
+/execute @a[tag=CTFResetFlag,team=CTFRed] ~ ~ ~ summon ArmorStand ~ ~ ~ {Tags:["CTFBlueFlag","CTFFlag"],Invulnerable:1b,NoBasePlate:1b,Small:1b,Marker:1b,ArmorItems:[{},{},{},{id:"wool",Count:1b,Damage:11}],HandItems:[{},{}],CustomName:"Blue Flag",DisabledSlots:0,Glowing:1b}
+/execute @a[tag=CTFResetFlag,team=CTFBlue] ~ ~ ~ summon ArmorStand ~ ~ ~ {Tags:["CTFRedFlag","CTFFlag"],Invulnerable:1b,NoBasePlate:1b,Small:1b,Marker:1b,ArmorItems:[{},{},{},{id:"wool",Count:1b,Damage:14}],HandItems:[{},{}],CustomName:"Red Flag",DisabledSlots:0,Glowing:1b}
+/execute @a[tag=CTFResetFlag,team=CTFRed] ~ ~ ~ scoreboard teams join CTFVBlue @e[type=ArmorStand,tag=CTFBlueFlag]
+/execute @a[tag=CTFResetFlag,team=CTFBlue] ~ ~ ~ scoreboard teams join CTFVRed @e[type=ArmorStand,tag=CTFRedFlag]
 // Create flag drop timer
 /execute @a[tag=CTFResetFlag,team=CTFRed] ~ ~ ~ summon AreaEffectCloud ~ ~ ~ {Duration:1201,Tags:["CTFBlueFlagTimer"]}
 /execute @a[tag=CTFResetFlag,team=CTFBlue] ~ ~ ~ summon AreaEffectCloud ~ ~ ~ {Duration:1201,Tags:["CTFRedFlagTimer"]}
@@ -494,8 +476,8 @@
 /scoreboard players set @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker] CTFFlagTracker 1
 
 // Give the flag to the person nearest it of the opposite team
-/execute @e[type=Item,tag=CTFRedFlag] ~ ~ ~ scoreboard players tag @p[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue,r=1] add CTFPickupRedFlag
-/execute @e[type=Item,tag=CTFBlueFlag] ~ ~ ~ scoreboard players tag @p[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed,r=1] add CTFPickupBlueFlag
+/execute @e[type=ArmorStand,tag=CTFRedFlag] ~ ~ ~ scoreboard players tag @p[score_CTFActive_min=1,score_CTFActive=1,team=CTFBlue,r=1] add CTFPickupRedFlag
+/execute @e[type=ArmorStand,tag=CTFBlueFlag] ~ ~ ~ scoreboard players tag @p[score_CTFActive_min=1,score_CTFActive=1,team=CTFRed,r=1] add CTFPickupBlueFlag
 
 /scoreboard players set @a[tag=CTFPickupRedFlag] CTFFlagTracker 1
 /scoreboard players set @a[tag=CTFPickupBlueFlag] CTFFlagTracker 1
@@ -522,18 +504,18 @@
 /replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFFlagTracker_min=1,team=CTFBlue] slot.hotbar.4 wool 1 14 {display:{Name:"Enemy Flag"},ench:[{id:19,lvl:1}]}
 
 // If the flag marker isn't holding the flag, a player must be. So kill existing flags
-/execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedFlagMarker,score_CTFFlagTracker=0] ~ ~ ~ kill @e[type=Item,tag=CTFRedFlag]
-/execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker,score_CTFFlagTracker=0] ~ ~ ~ kill @e[type=Item,tag=CTFBlueFlag]
+/execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedFlagMarker,score_CTFFlagTracker=0] ~ ~ ~ kill @e[type=ArmorStand,tag=CTFRedFlag]
+/execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker,score_CTFFlagTracker=0] ~ ~ ~ kill @e[type=ArmorStand,tag=CTFBlueFlag]
 
 // Summon a flag if the marker is holding it. Don't summon if one already exists
-/execute @e[type=ArmorStand,tag=CTFExists] ~ ~ ~ execute @e[type=Item,tag=CTFRedFlag] ~ ~ ~ scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 1
-/execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedFlagMarker,score_CTFFlagTracker_min=1] ~ ~ ~ summon Item ~ ~ ~ {Tags:["CTFRedFlag","CTFFlag"],PickupDelay:32767,Age:-32768,Item:{id:"wool",Count:1,Damage:14},CustomName:"Red Flag",CustomNameVisible:true,Glowing:true}
-/execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedFlagMarker,score_CTFFlagTracker_min=1] ~ ~ ~ scoreboard teams join CTFVRed @e[type=Item,tag=CTFRedFlag]
+/execute @e[type=ArmorStand,tag=CTFExists] ~ ~ ~ execute @e[type=ArmorStand,tag=CTFRedFlag] ~ ~ ~ scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 1
+/execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedFlagMarker,score_CTFFlagTracker_min=1] ~ ~ ~ summon ArmorStand ~ ~ ~ {Tags:["CTFRedFlag","CTFFlag"],Invulnerable:1b,NoBasePlate:1b,Small:1b,Marker:1b,ArmorItems:[{},{},{},{id:"wool",Count:1b,Damage:14}],HandItems:[{},{}],CustomName:"Red Flag",DisabledSlots:0,Glowing:1b}
+/execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFRedFlagMarker,score_CTFFlagTracker_min=1] ~ ~ ~ scoreboard teams join CTFVRed @e[type=ArmorStand,tag=CTFRedFlag]
 /scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 0
 
-/execute @e[type=ArmorStand,tag=CTFExists] ~ ~ ~ execute @e[type=Item,tag=CTFBlueFlag] ~ ~ ~ scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 1
-/execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker,score_CTFFlagTracker_min=1] ~ ~ ~ summon Item ~ ~ ~ {Tags:["CTFBlueFlag","CTFFlag"],PickupDelay:32767,Age:-32768,Item:{id:"wool",Count:1,Damage:11},CustomName:"Blue Flag",CustomNameVisible:true,Glowing:true}
-/execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker,score_CTFFlagTracker_min=1] ~ ~ ~ scoreboard teams join CTFVBlue @e[type=Item,tag=CTFBlueFlag]
+/execute @e[type=ArmorStand,tag=CTFExists] ~ ~ ~ execute @e[type=ArmorStand,tag=CTFBlueFlag] ~ ~ ~ scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 1
+/execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker,score_CTFFlagTracker_min=1] ~ ~ ~ summon ArmorStand ~ ~ ~ {Tags:["CTFBlueFlag","CTFFlag"],Invulnerable:1b,NoBasePlate:1b,Small:1b,Marker:1b,ArmorItems:[{},{},{},{id:"wool",Count:1b,Damage:11}],HandItems:[{},{}],CustomName:"Blue Flag",DisabledSlots:0,Glowing:1b}
+/execute @e[type=ArmorStand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFBlueFlagMarker,score_CTFFlagTracker_min=1] ~ ~ ~ scoreboard teams join CTFVBlue @e[type=ArmorStand,tag=CTFBlueFlag]
 /scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 0
 
 // Expose the thief!
@@ -548,8 +530,8 @@
 /execute @e[type=AreaEffectCloud,tag=CTFKillBlueFlag] ~ ~ ~ tellraw @a[score_CTFActive_min=1] ["The ", {"text":"Blue","color":"blue"}, " flag has been returned to its base!"]
 /execute @e[type=AreaEffectCloud,tag=CTFKillBlueFlag] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound block.note.hat master @p ~ ~ ~
 
-/execute @e[type=AreaEffectCloud,tag=CTFKillRedFlag] ~ ~ ~ kill @e[type=Item,tag=CTFRedFlag]
-/execute @e[type=AreaEffectCloud,tag=CTFKillBlueFlag] ~ ~ ~ kill @e[type=Item,tag=CTFBlueFlag]
+/execute @e[type=AreaEffectCloud,tag=CTFKillRedFlag] ~ ~ ~ kill @e[type=ArmorStand,tag=CTFRedFlag]
+/execute @e[type=AreaEffectCloud,tag=CTFKillBlueFlag] ~ ~ ~ kill @e[type=ArmorStand,tag=CTFBlueFlag]
 
 /scoreboard players tag @e[type=AreaEffectCloud,tag=CTFRedFlagTimer] remove CTFKillRedFlag
 /scoreboard players tag @e[type=AreaEffectCloud,tag=CTFBlueFlagTimer] remove CTFKillBlueFlag
@@ -617,11 +599,15 @@
 /effect @a[score_CTFActive_min=1,score_CTFActive=1] instant_health 1 2 true
 
 // Kill items and xp
-/kill @e[score_CTFActive_min=1,type=Item,tag=!CTFFlag]
+/kill @e[score_CTFActive_min=1,type=Item]
 /kill @e[score_CTFActive_min=1,type=XPOrb]
 /kill @e[score_CTFActive_min=1,type=Arrow]
 // Remove flags as to not give players the false message that they stil have it
 /replaceitem entity @a[score_CTFActive_min=1,score_CTFActive=1] slot.hotbar.4 air 1 0
+
+// Flag Marker particles
+/execute @e[type=ArmorStand,tag=CTFRedFlagMarker] ~ ~ ~ particle reddust ~ ~.8 ~ 1 0 0 1 0
+/execute @e[type=ArmorStand,tag=CTFBlueFlagMarker] ~ ~ ~ particle reddust ~ ~.8 ~ 0.001 0 1 1 0
 
 // Summon end countdown timer if it doesn't exist
 /execute @e[type=ArmorStand,tag=CTFExists] ~ ~ ~ execute @e[type=AreaEffectCloud,tag=CTFEndTimer] ~ ~ ~ scoreboard players set @e[type=ArmorStand,tag=CTFExists] CTFExists 1
@@ -663,8 +649,48 @@
 /execute @e[type=AreaEffectCloud,tag=CTFEndGame] ~ ~ ~ scoreboard players set Blue CTFScore 0
 /execute @e[type=AreaEffectCloud,tag=CTFEndGame] ~ ~ ~ scoreboard players set * CTFFlagTracker 0
 /execute @e[type=AreaEffectCloud,tag=CTFEndGame] ~ ~ ~ scoreboard players set @e[type=ArmorStand,tag=CTFGame] CTFGameState 0
+/execute @e[type=AreaEffectCloud,tag=CTFEndGame] ~ ~ ~ kill @e[type=ArmorStand,tag=CTFFlag]
 
 // Remove the tags
 /scoreboard players tag @e[type=AreaEffectCloud,tag=CTFInitialRocket] remove CTFInitialRocket
 /scoreboard players tag @e[type=FireworksRocketEntity,tag=CTFCreateRocket] remove CTFCreateRocket
 /scoreboard players tag @e[type=AreaEffectCloud,tag=CTFEndGame] remove CTFEndGame
+
+:uninstall PULSE 16 0 1
+// Teleport all players back to spawn and clear inventories
+/execute @a[score_CTFActive_min=1,score_CTFActive=1] ~ ~ ~ tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint]
+/execute @a[tag=CTFSpectator] ~ ~ ~ tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint]
+/clear @a[score_CTFActive_min=1,score_CTFActive=1]
+
+// Gets rid of all scoreboard objectives, entities, and resets gamerules to vanilla defaults
+/kill @e[type=ArmorStand,tag=CTFGame]
+/kill @e[type=ArmorStand,tag=CTFRedMarker]
+/kill @e[type=ArmorStand,tag=CTFBlueMarker]
+/kill @e[type=ArmorStand,tag=CTFTeamBalancer]
+/kill @e[type=ArmorStand,tag=CTFExists]
+/kill @e[type=ArmorStand,tag=CTFFlag]
+/kill @e[type=AreaEffectCloud,tag=CTFStartTimer]
+/scoreboard objectives remove CTFGameState
+/scoreboard objectives remove CTFActive
+/scoreboard objectives remove CTFScore
+/scoreboard objectives remove CTFScoreKeeper
+/scoreboard objectives remove CTFTeamCounter
+/scoreboard objectives remove CTFFlagTracker
+/scoreboard objectives remove CTFDeathCount
+/scoreboard objectives remove CTFDisconnect
+/scoreboard objectives remove CTFRoundTime
+/scoreboard objectives remove CTFTrigger
+/scoreboard objectives remove CTFSpectate
+/scoreboard objectives remove CTFExists
+/scoreboard objectives remove CTFResupply
+/scoreboard teams remove CTFRed
+/scoreboard teams remove CTFBlue
+/scoreboard teams remove CTFEC
+/scoreboard teams remove CTFVRed
+/scoreboard teams remove CTFVBlue
+/gamerule naturalRegeneration true
+
+// Configure event server spawn point system
+/scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPtp 33
+/scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPsat 1
+/scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPpvp 0

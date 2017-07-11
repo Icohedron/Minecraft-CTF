@@ -9,7 +9,7 @@ kill @e[type=armor_stand,tag=CTFRedMarker]
 kill @e[type=armor_stand,tag=CTFBlueMarker]
 kill @e[type=armor_stand,tag=CTFTeamBalancer]
 kill @e[type=armor_stand,tag=CTFExists]
-kill @e[type=item,tag=CTFFlag]
+kill @e[type=armor_stand,tag=CTFFlag]
 kill @e[type=area_effect_cloud,tag=CTFStartTimer]
 scoreboard objectives remove CTFGameState
 scoreboard objectives remove CTFActive

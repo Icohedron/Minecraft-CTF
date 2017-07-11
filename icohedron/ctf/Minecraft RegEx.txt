@@ -14,6 +14,25 @@
 # Replace:
 \1entity
 
+# Converting from 1.11+ to 1.10.2
+(type=|summon\s)(xp_orb)
+\1XPOrb
+
+(type=|summon\s)(armor_stand)
+\1ArmorStand
+
+(type=|summon\s)(fireworks_rocket)
+\1FireworksRocketEntity
+
+(type=|summon\s)(item)
+\1Item
+
+(type=|summon\s)(arrow)
+\1Arrow
+
+(type=|summon\s)(area_effect_cloud)
+\1AreaEffectCloud
+
 # For integrating with CBP
 # Add '/' to before all lines that are not blank, do not already start with '/', and don't start with ':'
 # Find:
