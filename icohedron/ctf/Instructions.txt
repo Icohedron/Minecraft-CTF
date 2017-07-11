@@ -1,5 +1,6 @@
 # Have at least one of each from icohedron:ctf/markers/items in your map.
 # Only one of each flag may be in a map.
+# Only one game can be running at a time.
 
 # Modify [User Input 1] in icohedron:ctf/main if you plan to have multiple arenas in the same Minecraft map.
 # Change the selector as stated so that it encapsulates the entire area of your map. 
@@ -15,8 +16,8 @@ scoreboard players set @p MCTeams 8
 # Instructions for running in 1.12
 # 1. Follow the above steps
 # 2. Run icohedron:ctf/install
-# 3. Then keep icohedron:ctf/main on a loop
-# 4. Run icohedron:ctf/uninstall when finished
+# 3. Run icohedron:ctf/main on a loop
+# 4. Turn off icohedron:ctf/main and run icohedron:ctf/uninstall when finished
 
 # Instructions for running in 1.10.2
 # It's... more complicated. Not recommended

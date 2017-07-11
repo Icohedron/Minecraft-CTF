@@ -1,7 +1,7 @@
 # This condition must pass before the rest of the commands in this file run.
 testfor @e[type=armor_stand,tag=CTFGame,score_CTFGameState_min=2,score_CTFGameState=2]
 # For command block chains initially facing towards positive x (don't set to "Always Active", must be turned on/off with the condition above. Otherwise, it may keep running even after the arena is turned off):
-# setblock ~ ~ ~ minecraft:repeating_command_block 13 replace {TrackOutput:0b,auto:0b}
+# setblock ~ ~ ~ repeating_command_block 13 replace {TrackOutput:0b,auto:0b}
 
 # Respawn. Teleport all players in a 3 block radius around the lobby spawn point to their team's spawn point. Also resupply their inventory
 execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFLobbySpawnPoint] ~ ~ ~ clear @a[score_CTFActive_min=1,score_CTFActive=1,r=3] arrow
@@ -35,15 +35,23 @@ scoreboard players tag @e[score_CTFActive_min=1,type=arrow] add InGround {inGrou
 kill @e[score_CTFActive_min=1,type=arrow,tag=InGround]
 
 # Resupply points
-execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,r=1] ~ ~ ~ clear @p arrow
-execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,r=1] ~ ~ ~ replaceitem entity @p slot.hotbar.0 iron_sword 1 0 {Unbreakable:1}
-execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,r=1] ~ ~ ~ replaceitem entity @p slot.hotbar.1 bow 1 0 {Unbreakable:1}
-execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,r=1] ~ ~ ~ replaceitem entity @p slot.hotbar.7 arrow 32 0
+scoreboard players add @a[score_CTFActive_min=1,score_CTFActive=1] CTFResupply 0
 
-execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,r=1,team=CTFRed] ~ ~ ~ replaceitem entity @p slot.hotbar.8 wool 1 14 {display:{Name:"Your Team"}}
-execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,r=1,team=CTFBlue] ~ ~ ~ replaceitem entity @p slot.hotbar.8 wool 1 11 {display:{Name:"Your Team"}}
+execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1] ~ ~ ~ clear @p arrow
+execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1] ~ ~ ~ replaceitem entity @p slot.hotbar.0 iron_sword 1 0 {Unbreakable:1}
+execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1] ~ ~ ~ replaceitem entity @p slot.hotbar.1 bow 1 0 {Unbreakable:1}
+execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1] ~ ~ ~ replaceitem entity @p slot.hotbar.7 arrow 32 0
 
-# execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ effect @a[score_CTFActive_min=1,score_CTFActive=1,r=1] instant_health 1 0
+execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1,team=CTFRed] ~ ~ ~ replaceitem entity @p slot.hotbar.8 wool 1 14 {display:{Name:"Your Team"}}
+execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1,team=CTFBlue] ~ ~ ~ replaceitem entity @p slot.hotbar.8 wool 1 11 {display:{Name:"Your Team"}}
+
+execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ effect @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1] instant_health 1 0
+
+# Start cooldown timer
+execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFResupplyPoint] ~ ~ ~ scoreboard players set @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1] CTFResupply 60
+
+# Count down resupply cooldown timer
+scoreboard players remove @a[score_CTFResupply_min=1] CTFResupply 1
 
 ### Flag Mechanics ###
 
@@ -206,4 +214,3 @@ scoreboard players set @a CTFDeathCount 0
 
 # Count down on timer
 scoreboard players remove @e[type=armor_stand,tag=CTFGame] CTFRoundTime 1
-

@@ -23,6 +23,7 @@ scoreboard objectives add CTFTrigger trigger Context Trigger
 scoreboard objectives add CTFSpectate trigger Spectate
 scoreboard objectives add CTFDeathCount deathCount Death Count
 scoreboard objectives add CTFDisconnect stat.leaveGame Disconnect Counter
+scoreboard objectives add CTFResupply dummy Resupply Timer
 
 # Entities with CTFFlagTracker == 1 are the holder of a flag
 # Exception is for the armor stands CTFRed and CTFBlue which count score

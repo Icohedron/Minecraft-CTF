@@ -1,7 +1,7 @@
 # This condition must pass before the rest of the commands in this file run.
 testfor @e[type=armor_stand,tag=CTFGame,score_CTFGameState_min=1,score_CTFGameState=1]
 # For command block chains initially facing towards positive x (don't set to "Always Active", must be turned on/off with the condition above. Otherwise, it may keep running even after the arena is turned off):
-# setblock ~ ~ ~ minecraft:repeating_command_block 13 replace {TrackOutput:0b,auto:0b}
+# setblock ~ ~ ~ repeating_command_block 13 replace {TrackOutput:0b,auto:0b}
 
 # Effects
 effect @a[score_CTFActive_min=1,score_CTFActive=1] saturation 1 2 true
@@ -44,19 +44,19 @@ scoreboard players tag @e[type=area_effect_cloud,tag=CTFStartTimer] add CTFStart
 
 # Execute the commands that correspond to each age
 execute @e[type=area_effect_cloud,tag=CTFCount10] ~ ~ ~ tellraw @a[score_CTFActive_min=1] ["Capture the Flag begins in 10 seconds"]
-execute @e[type=area_effect_cloud,tag=CTFCount10] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound minecraft:block.note.pling master @p
+execute @e[type=area_effect_cloud,tag=CTFCount10] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound block.note.pling master @p
 execute @e[type=area_effect_cloud,tag=CTFCount5] ~ ~ ~ tellraw @a[score_CTFActive_min=1] ["5"]
-execute @e[type=area_effect_cloud,tag=CTFCount5] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound minecraft:block.note.pling master @p
+execute @e[type=area_effect_cloud,tag=CTFCount5] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound block.note.pling master @p
 execute @e[type=area_effect_cloud,tag=CTFCount4] ~ ~ ~ tellraw @a[score_CTFActive_min=1] ["4"]
-execute @e[type=area_effect_cloud,tag=CTFCount4] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound minecraft:block.note.pling master @p
+execute @e[type=area_effect_cloud,tag=CTFCount4] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound block.note.pling master @p
 execute @e[type=area_effect_cloud,tag=CTFCount3] ~ ~ ~ tellraw @a[score_CTFActive_min=1] ["3"]
-execute @e[type=area_effect_cloud,tag=CTFCount3] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound minecraft:block.note.pling master @p
+execute @e[type=area_effect_cloud,tag=CTFCount3] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound block.note.pling master @p
 execute @e[type=area_effect_cloud,tag=CTFCount2] ~ ~ ~ tellraw @a[score_CTFActive_min=1] ["2"]
-execute @e[type=area_effect_cloud,tag=CTFCount2] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound minecraft:block.note.pling master @p
+execute @e[type=area_effect_cloud,tag=CTFCount2] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound block.note.pling master @p
 execute @e[type=area_effect_cloud,tag=CTFCount1] ~ ~ ~ tellraw @a[score_CTFActive_min=1] ["1"]
-execute @e[type=area_effect_cloud,tag=CTFCount1] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound minecraft:block.note.pling master @p
+execute @e[type=area_effect_cloud,tag=CTFCount1] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound block.note.pling master @p
 execute @e[type=area_effect_cloud,tag=CTFStart] ~ ~ ~ tellraw @a[score_CTFActive_min=1] ["Begin!"]
-execute @e[type=area_effect_cloud,tag=CTFStart] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound minecraft:entity.wither.death master @p
+execute @e[type=area_effect_cloud,tag=CTFStart] ~ ~ ~ execute @a[score_CTFActive_min=1] ~ ~ ~ playsound entity.wither.death master @p
 execute @e[type=area_effect_cloud,tag=CTFStart] ~ ~ ~ scoreboard players set @e[type=armor_stand,tag=CTFGame] CTFGameState 2
 
 # Remove the tags

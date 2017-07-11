@@ -1,7 +1,7 @@
 # This condition must pass before the rest of the commands in this file run.
 testfor @e[type=armor_stand,tag=CTFGame,score_CTFGameState_min=0,score_CTFGameState=0]
 # For command block chains initially facing towards positive x (don't set to "Always Active", must be turned on/off with the condition above. Otherwise, it may keep running even after the arena is turned off):
-# setblock ~ ~ ~ minecraft:repeating_command_block 13 replace {TrackOutput:0b,auto:0b}
+# setblock ~ ~ ~ repeating_command_block 13 replace {TrackOutput:0b,auto:0b}
 
 # Effects
 effect @a[score_CTFActive_min=1,score_CTFActive=1] weakness 1 100 true

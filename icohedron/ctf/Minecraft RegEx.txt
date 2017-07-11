@@ -4,9 +4,9 @@
 # Add 'minecraft:' prefixes to all vanilla commands
 # Keep replacing until no more matches are found
 # Find:
-(^\s*|\n\s*|(execute\s.*(~-?\d*\s){3}))(advancement|ban|ban-ip|banlist|blockdata|clear|clone|debug|defaultgamemode|deop|difficulty|effect|enchant|entitydata|execute|fill|function|gamemode|gamerule|give|help|kick|kill|list|locate|me|op|pardon|particle|playsound|public|recipe|reload|replaceitem|save|save-all|save-off|save-on|say|scoreboard|seed|setblock|setidletimeout|setmaxplayers|setworldspawn|spawnpoint|spreadplayers|stats|stop|stopsound|summon|teleport|tell|tellraw|testfor|testforblock|testforblocks|time|title|toggledownfall|tp|transferserver|trigger|weather|whitelist|worldborder|wsserver|xp)
+((^\s*|\n\s*|(execute\s.*(~-?\d*\s){3})|\\*"?value\\*"?:\\*"?|Command:")/?)(advancement|ban|ban-ip|banlist|blockdata|clear|clone|debug|defaultgamemode|deop|difficulty|effect|enchant|entitydata|execute|fill|function|gamemode|gamerule|give|help|kick|kill|list|locate|me|op|pardon|particle|playsound|public|recipe|reload|replaceitem|save|save-all|save-off|save-on|say|scoreboard|seed|setblock|setidletimeout|setmaxplayers|setworldspawn|spawnpoint|spreadplayers|stats|stop|stopsound|summon|teleport|tell|tellraw|testfor|testforblock|testforblocks|time|title|toggledownfall|tp|transferserver|trigger|weather|whitelist|worldborder|wsserver|xp)
 # Replace:
-\1minecraft:\4
+\1minecraft:\5
 
 # Replacing entity names
 # Find:
@@ -20,3 +20,9 @@
 (^[^/:].+$)
 # Replace:
 /\1
+
+# Replace all '#' at the beginning of lines with '//'
+# Find:
+^#
+# Replace:
+//

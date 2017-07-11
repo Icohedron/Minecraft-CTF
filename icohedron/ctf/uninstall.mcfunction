@@ -23,6 +23,7 @@ scoreboard objectives remove CTFRoundTime
 scoreboard objectives remove CTFTrigger
 scoreboard objectives remove CTFSpectate
 scoreboard objectives remove CTFExists
+scoreboard objectives remove CTFResupply
 scoreboard teams remove CTFRed
 scoreboard teams remove CTFBlue
 scoreboard teams remove CTFEC

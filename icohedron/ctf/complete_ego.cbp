@@ -74,6 +74,11 @@
 // Turn off natural regeneration
 /gamerule naturalRegeneration false
 
+// Configure event server spawn point system
+/scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPtp 33
+/scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPsat 0
+/scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPpvp 1
+
 :uninstall PULSE 16 0 1
 // Teleport all players back to spawn and clear inventories
 /execute @a[score_CTFActive_min=1,score_CTFActive=1] ~ ~ ~ tp @p @r[score_CTFActive_min=1,type=ArmorStand,tag=CTFLobbySpawnPoint]
@@ -108,6 +113,11 @@
 /scoreboard teams remove CTFVBlue
 /gamerule naturalRegeneration true
 
+// Configure event server spawn point system
+/scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPtp 33
+/scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPsat 1
+/scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPpvp 0
+
 :main CLOCK 16 0 1
 // Keep track of which entities are currently in the game
 /scoreboard players set @e CTFActive 0
@@ -129,9 +139,9 @@
 // [User Input 2]
 // Use event server spawn point system. Set spawn points to a random active lobby spawn point
 // Use the assigned 'SPid' for the map -- currently using 33
-// /scoreboard players add @a[score_CTFActive_min=1,score_CTFActive=1] SPid 0
-// /scoreboard players set @a[score_CTFActive_min=1,score_CTFActive=1,score_SPid=-34] SPid 33
-// /scoreboard players set @a[score_CTFActive_min=1,score_CTFActive=1,score_SPid_min=-32] SPid 33
+/scoreboard players add @a[score_CTFActive_min=1,score_CTFActive=1] SPid 0
+/scoreboard players set @a[score_CTFActive_min=1,score_CTFActive=1,score_SPid=-34] SPid 33
+/scoreboard players set @a[score_CTFActive_min=1,score_CTFActive=1,score_SPid_min=-32] SPid 33
 
 // CTF Control Panel book given to Event Coordinators
 // /give @p written_book 1 0 {pages:["[\"\",{\"text\":\"Capture the Flag\",\"bold\":true},{\"text\":\"\\n\",\"bold\":false},{\"text\":\"Game: \"},{\"text\":\"[Start]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 1\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Teams: \",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[Add Red]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 6\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[Add Blue]\",\"color\":\"blue\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 7\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Winning Score:\",\"color\":\"none\"},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[-]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 5\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[+]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 4\"}},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"Time Limit: \",\"color\":\"none\"},{\"text\":\"\\n\",\"color\":\"none\"},{\"text\":\"[-1 min]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 3\"}},{\"text\":\" \",\"color\":\"none\"},{\"text\":\"[+1 min]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/trigger CTFTrigger set 2\"}}]"],title:Book,author:TellrawGenerator}
@@ -222,8 +232,8 @@
 
 // [User Input 3]
 // Use regular spawn point system
-/spawnpoint @a[tag=CTFJoiningTeam]
-/execute @a[tag=CTFJoiningTeam] ~ ~ ~ tellraw @p ["Your spawn point has been set"]
+// spawnpoint @a[tag=CTFJoiningTeam]
+// execute @a[tag=CTFJoiningTeam] ~ ~ ~ tellraw @p ["Your spawn point has been set"]
 
 // Clear inventory, teleport to team spawn, announce joining of team, join team, give items
 /scoreboard players set @a[tag=CTFJoiningTeam,score_CTFFlagTracker_min=1] CTFFlagTracker 0
@@ -412,6 +422,11 @@
 /kill @e[score_CTFActive_min=1,type=Arrow,tag=InGround]
 
 // Resupply points
+/scoreboard players tag @a[score_CTFActive_min=1,score_CTFActive=1] add CTFNotOnResupply
+/execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ scoreboard players tag @a[score_CTFActive_min=1,score_CTFActive=1,r=1] remove CTFNotOnResupply
+/scoreboard players set @a[tag=CTFNotOnResupply] CTFResupply 0
+/scoreboard players tag @a[tag=CTFNotOnResupply] remove CTFNotOnResupply
+
 /execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1] ~ ~ ~ clear @p arrow
 /execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1] ~ ~ ~ replaceitem entity @p slot.hotbar.0 iron_sword 1 0 {Unbreakable:1}
 /execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ execute @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1] ~ ~ ~ replaceitem entity @p slot.hotbar.1 bow 1 0 {Unbreakable:1}
@@ -423,7 +438,7 @@
 /execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ effect @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1] instant_health 1 0
 
 // Start cooldown timer
-/execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ scoreboard players set @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1,team=CTFBlue] CTFResupply 60
+/execute @e[score_CTFActive_min=1,type=ArmorStand,tag=CTFResupplyPoint] ~ ~ ~ scoreboard players set @a[score_CTFActive_min=1,score_CTFActive=1,score_CTFResupply=0,r=1] CTFResupply 60
 
 // Count down resupply cooldown timer
 /scoreboard players remove @a[score_CTFResupply_min=1] CTFResupply 1

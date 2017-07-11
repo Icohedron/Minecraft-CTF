@@ -19,8 +19,6 @@ scoreboard teams leave @a[score_CTFActive_min=2,team=CTFBlue]
 # Use event server spawn point system. Set spawn points to a random active lobby spawn point
 # Use the assigned 'SPid' for the map -- currently using 33
 # scoreboard players add @a[score_CTFActive_min=1,score_CTFActive=1] SPid 0
-# execute @a[score_CTFActive_min=1,score_CTFActive=1,score_SPid=-34] ~ ~ ~ tp @p @r[score_CTFActive_min=1,type=armor_stand,tag=CTFLobbySpawnPoint]
-# execute @a[score_CTFActive_min=1,score_CTFActive=1,score_SPid_min=-32] ~ ~ ~ tp @p @r[score_CTFActive_min=1,type=armor_stand,tag=CTFLobbySpawnPoint]
 # scoreboard players set @a[score_CTFActive_min=1,score_CTFActive=1,score_SPid=-34] SPid 33
 # scoreboard players set @a[score_CTFActive_min=1,score_CTFActive=1,score_SPid_min=-32] SPid 33
 
