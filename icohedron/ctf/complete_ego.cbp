@@ -691,6 +691,6 @@
 /gamerule naturalRegeneration true
 
 // Configure event server spawn point system
-/scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPtp 33
+/scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPtp 0
 /scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPsat 1
 /scoreboard players set @e[type=ArmorStand,tag=SpawnStand] SPpvp 0

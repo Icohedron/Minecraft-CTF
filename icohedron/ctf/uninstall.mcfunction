@@ -32,6 +32,6 @@ scoreboard teams remove CTFVBlue
 gamerule naturalRegeneration true
 
 # Configure event server spawn point system
-scoreboard players set @e[type=armor_stand,tag=SpawnStand] SPtp 33
+scoreboard players set @e[type=armor_stand,tag=SpawnStand] SPtp 0
 scoreboard players set @e[type=armor_stand,tag=SpawnStand] SPsat 1
 scoreboard players set @e[type=armor_stand,tag=SpawnStand] SPpvp 0
