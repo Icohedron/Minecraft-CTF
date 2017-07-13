@@ -18,12 +18,12 @@ execute @e[type=armor_stand,tag=CTFBlueFlagMarker] ~ ~ ~ particle reddust ~ ~.8 
 
 # Summon a flag if one does not exist
 execute @e[type=armor_stand,tag=CTFExists] ~ ~ ~ execute @e[type=armor_stand,tag=CTFRedFlag] ~ ~ ~ scoreboard players set @e[type=armor_stand,tag=CTFExists] CTFExists 1
-execute @e[type=armor_stand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFRedFlagMarker] ~ ~ ~ summon armor_stand ~ ~ ~ {Tags:["CTFRedFlag","CTFFlag"],Invulnerable:1b,NoBasePlate:1b,Small:1b,Marker:0b,ArmorItems:[{},{},{},{id:"wool",Count:1b,Damage:14}],HandItems:[{},{}],CustomName:"Red Flag",DisabledSlots:0,Glowing:1b,CustomNameVisible:1b}
+execute @e[type=armor_stand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFRedFlagMarker] ~ ~ ~ summon armor_stand ~ ~ ~ {Tags:["CTFRedFlag","CTFFlag"],Invulnerable:1b,NoBasePlate:1b,Small:1b,Marker:1b,ArmorItems:[{},{},{},{id:"wool",Count:1b,Damage:14}],HandItems:[{},{}],CustomName:"Red Flag",DisabledSlots:0,Glowing:1b,CustomNameVisible:1b,Invisible:1b}
 execute @e[type=armor_stand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFRedFlagMarker] ~ ~ ~ scoreboard teams join CTFVRed @e[type=armor_stand,tag=CTFRedFlag]
 scoreboard players set @e[type=armor_stand,tag=CTFExists] CTFExists 0
 
 execute @e[type=armor_stand,tag=CTFExists] ~ ~ ~ execute @e[type=armor_stand,tag=CTFBlueFlag] ~ ~ ~ scoreboard players set @e[type=armor_stand,tag=CTFExists] CTFExists 1
-execute @e[type=armor_stand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFBlueFlagMarker] ~ ~ ~ summon armor_stand ~ ~ ~ {Tags:["CTFBlueFlag","CTFFlag"],Invulnerable:1b,NoBasePlate:1b,Small:1b,Marker:0b,ArmorItems:[{},{},{},{id:"wool",Count:1b,Damage:11}],HandItems:[{},{}],CustomName:"Blue Flag",DisabledSlots:0,Glowing:1b,CustomNameVisible:1b}
+execute @e[type=armor_stand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFBlueFlagMarker] ~ ~ ~ summon armor_stand ~ ~ ~ {Tags:["CTFBlueFlag","CTFFlag"],Invulnerable:1b,NoBasePlate:1b,Small:1b,Marker:1b,ArmorItems:[{},{},{},{id:"wool",Count:1b,Damage:11}],HandItems:[{},{}],CustomName:"Blue Flag",DisabledSlots:0,Glowing:1b,CustomNameVisible:1b,Invisible:1b}
 execute @e[type=armor_stand,tag=CTFExists,score_CTFExists=0] ~ ~ ~ execute @e[score_CTFActive_min=1,type=armor_stand,tag=CTFBlueFlagMarker] ~ ~ ~ scoreboard teams join CTFVBlue @e[type=armor_stand,tag=CTFBlueFlag]
 scoreboard players set @e[type=armor_stand,tag=CTFExists] CTFExists 0
 
